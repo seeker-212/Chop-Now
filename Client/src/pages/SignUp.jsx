@@ -16,11 +16,11 @@ const SignUp = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen w-full flex items-center justify-center p-4"
       style={{ backgroundColor: bgColor }}
     >
       <div
-        className={`bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px] border-[${borderColor}]`}
+        className={`bg-white rounded-xl shadow-lg w-full max-w-md p-8 border-[1px]`}
         style={{ border: `1px solid ${borderColor}` }}
       >
         <h1
@@ -112,7 +112,7 @@ const SignUp = () => {
             Role
           </label>
           <div className="flex gap-2">
-            {["user", "owner", "Chop-Rider"].map((r) => (
+            {["user", "owner", "ChopNowRider"].map((r) => (
               <button
                 className="flex-1 border border-gray-400 rounded-lg px-2 py-2 text-center font-medium
                 transition-colors cursor-pointer"
@@ -128,6 +128,9 @@ const SignUp = () => {
             ))}
           </div>
         </div>
+        <button className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
+        active:bg-white active:text-green-600 bg-[#32CD32] text-white`} 
+        >Sign Up</button>
       </div>
     </div>
   );
