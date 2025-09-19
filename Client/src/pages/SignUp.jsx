@@ -4,6 +4,8 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
 
 const SignUp = () => {
   // Creating the color variable
@@ -21,6 +23,30 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+
+  //Creating a Function that handles sign up
+  const signUpHandler = async () => {
+    try {
+      //Calling axios
+      const result = await axios.post(
+        `${serverUrl}/api/auth/signup`,
+        {
+          fullName,
+          email,
+          mobile,
+          password,
+          role,
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div
@@ -91,7 +117,7 @@ const SignUp = () => {
             type="tel"
             className="w-full border border-gray-400 rounded-lg px-3 py-2 focus:outline-none 
             focus:border-green-500"
-            placeholder="Enter your Full Name"
+            placeholder="Enter your Mobile Number"
             required
           />
         </div>
@@ -115,6 +141,7 @@ const SignUp = () => {
               required
             />
             <button
+              type="button"
               className="absolute right-3 top-[13px] text-gray-500 cursor-pointer"
               onClick={() => setShowPassword((prev) => !prev)}
             >
@@ -134,6 +161,7 @@ const SignUp = () => {
           <div className="flex gap-2">
             {["user", "owner", "ChopNowRider"].map((r) => (
               <button
+                key={r}
                 className="flex-1 border border-gray-400 rounded-lg px-2 py-2 text-center font-medium
                 transition-colors cursor-pointer"
                 onClick={() => setRole(r)}
@@ -149,6 +177,7 @@ const SignUp = () => {
           </div>
         </div>
         <button
+          onClick={signUpHandler}
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
         >
