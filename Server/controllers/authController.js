@@ -88,3 +88,13 @@ import genToken from "../utils/token.js";
         res.status(400).json(`Sign In error ${error}`)
     }
 }
+
+export const signOut = async (params) => {
+    try {
+        res.clearCookie("token")
+        return res.status(200).json({message: "log out successfully"})
+    } catch (error) {
+        console.log(error)
+        res.status(400).json(`Sign Out error ${error}`)
+    }
+}
