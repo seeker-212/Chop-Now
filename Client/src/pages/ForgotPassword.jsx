@@ -2,24 +2,78 @@ import React from "react";
 import { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
 
 const ForgotPassword = () => {
-    //Navigation
-    const navigate = useNavigate()
+  //Navigation
+  const navigate = useNavigate();
 
   // Use State Variables..
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  //This functions will handle Forgot Password
+  const handleSendOtp = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/send-otp`,
+        { email },
+        { withCredentials: true }
+      );
+      console.log(result);
+      setStep(2);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/verify-otp`,
+        { email, otp },
+        { withCredentials: true }
+      );
+      console.log(result);
+      setStep(3);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    //Check if password is = to confirm password
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/reset-password`,
+        { email, newPassword },
+        { withCredentials: true }
+      );
+      console.log(result);
+      navigate("/signin");
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert(error.response?.data?.message || "Something went wrong");
+    }
+  };
 
   return (
     <div className="flex w-full items-center justify-center min-h-screen p-4 bg-[#fff9f6]">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8">
         <div className="flex items-center gap-4 mb-4">
           <IoIosArrowRoundBack
-            onClick={()=>navigate('/signin')}
+            onClick={() => navigate("/signin")}
             size={35}
             className="text-[#32CD32] cursor-pointer"
           />
@@ -48,20 +102,20 @@ const ForgotPassword = () => {
               />
             </div>
 
-            {/* SIGN EMAIL BUTTON */}
+            {/* Send Otp BUTTON */}
             <button
-            //   onClick={signUpHandler}
+              onClick={handleSendOtp}
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
             >
-              Send Email
+              Send Otp
             </button>
           </div>
         )}
 
         {/* ---------- STEP 2 TO RESET PASSWORD ---------- */}
         {step === 2 && (
-            <div>
+          <div>
             <div className="mb-4 ">
               <label
                 htmlFor="otp"
@@ -80,9 +134,9 @@ const ForgotPassword = () => {
               />
             </div>
 
-            {/* VERIFY BUTTON */}
+            {/* VERIFY OTP BUTTON */}
             <button
-            //   onClick={signUpHandler}
+              onClick={handleVerifyOtp}
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
             >
@@ -93,7 +147,7 @@ const ForgotPassword = () => {
 
         {/* ---------- STEP 3 TO RESET PASSWORD ---------- */}
         {step === 3 && (
-            <div>
+          <div>
             <div className="mb-4 ">
               <label
                 htmlFor="newpassword"
@@ -111,7 +165,7 @@ const ForgotPassword = () => {
                 required
               />
             </div>
-                {/* confirm the password */}
+            {/* confirm the password */}
             <div className="mb-4 ">
               <label
                 htmlFor="confirmPassword"
@@ -122,7 +176,7 @@ const ForgotPassword = () => {
               <input
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 value={confirmPassword}
-                type="text"
+                type="password"
                 className="w-full border-[1px] border-gray-400  rounded-lg px-3 py-2 focus:outline-none 
             focus:border-green-500"
                 placeholder="Confirm Password"
@@ -130,9 +184,9 @@ const ForgotPassword = () => {
               />
             </div>
 
-            {/* SIGN UP BUTTON */}
+            {/* PASSWORD RESET BUTTON */}
             <button
-            //   onClick={signUpHandler}
+              onClick={handlePasswordReset}
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white mt-2`}
             >

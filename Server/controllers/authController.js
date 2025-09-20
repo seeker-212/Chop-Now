@@ -29,7 +29,7 @@ export const signUp = async (req, res) => {
         .json({ message: " Phone number must be at least 11 digits." });
     }
 
-    //HASING USER PASSWORD 
+    //HASING USER PASSWORD
     const hashedPassword = await bcrypt.hash(password, 12);
 
     //Once everything is done then create User
@@ -109,81 +109,80 @@ export const signOut = async (req, res) => {
 // ------------Password-Reset Controller------------
 export const sendOtp = async (req, res) => {
   try {
-    const {email} = req.body
-    const user = await User.findOne({email})
+    const { email } = req.body;
+    const user = await User.findOne({ email });
 
     // checking if user exists
     if (!user) {
-      return res.status(400).json({message: "User does not exist."})
+      return res.status(400).json({ message: "User does not exist." });
     }
 
     // If user is avaliable then Generate Otp
-    const otp = Math.floor(1000 + Math.random() + 9000).toString()
-    user.resetOtp = otp
-    user.otpExpires = Date.now() + 5 * 60 * 1000
-    user.isOtpVerified = false
-    await user.save()
-    await sendOtpMail(email, otp)
+    const otp = Math.floor(1000 + Math.random() + 9000).toString();
+    user.resetOtp = otp;
+    user.otpExpires = Date.now() + 5 * 60 * 1000;
+    user.isOtpVerified = false;
+    await user.save();
+    await sendOtpMail(email, otp);
 
-    return res.status(200).json({message: "Otp sent successfully"})
+    return res.status(200).json({ message: "Otp sent successfully" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json(`Send otp error ${error}`);
   }
-}
+};
 
 // STILL UNDER PASSWORD RESET CONTROLLER ( otp verification)
 export const verifyOtp = async (req, res) => {
   try {
     // Requesting otp from (form body)
-    const {email, otp} = req.body
-    const user = await User.findOne({email})
+    const { email, otp } = req.body;
+    const user = await User.findOne({ email });
 
     //Checking if User email and otp is correct
     //Also checking if user inserted the otp before before the time expires
-    if (!user || user.resetOtp != otp || user.otpExpires < Date.now()) {
-      res.status(400).json({message: "invalid/expired OTP"})
+    if (!user || user.resetOtp !== otp || user.otpExpires < Date.now()) {
+      res.status(400).json({ message: "invalid/expired OTP" });
     }
 
-    // if everything correct then render this 
-    user.isOtpVerified = true
-    user.resetOtp = undefined
-    user.otpExpires = undefined
+    // if everything correct then render this
+    user.isOtpVerified = true;
+    user.resetOtp = undefined;
+    user.otpExpires = undefined;
 
     //Save user to the Database
-    await user.save()
+    await user.save();
 
-    return res.status(200).json({message: "Otp verified Successfully"})
+    return res.status(200).json({ message: "Otp verified Successfully" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json(`otp verification error ${error}`);
   }
-}
+};
 
 //STILL UNDER PASSWORD RESET CONTROLLER (Password Reset)
 export const resetPassword = async (req, res) => {
   try {
     //Requesting from form Data
-    const {email, newpassword} = req.body
-    const user = await User.findOne({email})
+    const { email, newPassword } = req.body;
+    const user = await User.findOne({ email });
 
     // Checking if user exists and user has OTP
     if (!user || !user.isOtpVerified) {
-      res.status(400).json({message: "otp verfication required"})
+      res.status(400).json({ message: "otp verfication required" });
     }
 
     //Then if user is verified
-    const hashedPassword = await bcrypt.hash(newpassword)
-    user.password = hashedPassword
-    user.isOtpVerified = false
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    user.password = hashedPassword;
+    user.isOtpVerified = false;
 
     //Save user to db
-    await user.save()
+    await user.save();
 
-    return req.status(200).json({message: "Password Reset Successfully."})
-
+    return res.status(200).json({ message: "Password Reset Successfully." });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json(`Reset password error ${error}`);
   }
-}
+};

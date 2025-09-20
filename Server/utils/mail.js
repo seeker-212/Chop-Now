@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer'
+import dotenv from "dotenv";
+dotenv.config();
+
 
 // Create a test account or replace with real credentials.
 const transporter = nodemailer.createTransport({
@@ -10,7 +13,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.PASS,
   },
 });
-
 
 export const sendOtpMail = async (to, otp) => {
     await transporter.sendMail({
