@@ -2,7 +2,7 @@ import User from "../model/userModel.js";
 import bcrypt from "bcryptjs";
 import genToken from "../utils/token.js";
 
-//Sign Up Conntroller for the User
+//------------ Sign Up Conntroller for the User ------------
 export const signUp = async (req, res) => {
   try {
     //Getting the data from the form body
@@ -28,7 +28,7 @@ export const signUp = async (req, res) => {
         .json({ message: " Phone number must be at least 11 digits." });
     }
 
-    //------------HASING USER PASSWORD -------------
+    //HASING USER PASSWORD 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     //Once everything is done then create User
@@ -57,7 +57,7 @@ export const signUp = async (req, res) => {
   }
 };
 
-//Sign Up Conntroller for the User
+// ------------- Sign Up Conntroller for the User ------------
 export const signIn = async (req, res) => {
   try {
     //Getting the data from the form body
@@ -94,6 +94,7 @@ export const signIn = async (req, res) => {
   }
 };
 
+// ------------LogOut ------------
 export const signOut = async (req, res) => {
   try {
     res.clearCookie("token");
