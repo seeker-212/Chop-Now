@@ -6,6 +6,8 @@ import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firesbase.js";
 
 const SignUp = () => {
   // Creating the color variable
@@ -47,6 +49,28 @@ const SignUp = () => {
       console.log(error);
     }
   };
+
+  //Sign Up with GOOGLE AUTH
+  const handleGoogleAuth = async () => {
+    if (!mobile) {
+      return alert("mobile is required")
+    }
+    const provider = new GoogleAuthProvider()
+    const result = await signInWithPopup(auth, provider)
+
+    try {
+      const {data} = await axios.post(`${serverUrl}/api/auth/google-auth`, 
+        {fullName: result.user.displayName,
+          email: result.user.email,
+          role,
+          mobile
+        }, {withCredentials: true}
+      )
+      console.log(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <div
@@ -185,6 +209,7 @@ const SignUp = () => {
         </button>
 
         <button
+        onClick={handleGoogleAuth}
           className="w-full mt-4 flex items-center justify-center gap-2 border border-gray-400 rounded-lg
         px-4 py-2 transition duration-200 hover:bg-gray-100 cursor-pointer"
         >

@@ -186,3 +186,37 @@ export const resetPassword = async (req, res) => {
     res.status(500).json(`Reset password error ${error}`);
   }
 };
+
+//Google Authentication Controller
+export  const googleAuth = async (req, res) => {
+  try {
+     // Requesting data from form body
+    const {fullName, email, mobile, role} = req.body
+    let user = await User.findOne({email})
+
+    // Checking if user exists
+    if (!user) {
+      user = await User.create({
+        fullName,
+        email,
+        mobile,
+        role
+      })
+    }
+
+     const token = await genToken(user._id);
+    res.cookie("token", token, {
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 1000,
+      httpOnly: true,
+    });
+
+    // After account is created
+    //Or is account is created successfully
+    res.status(201).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(`Creating Account with error Google${error}`);
+  }
+}
