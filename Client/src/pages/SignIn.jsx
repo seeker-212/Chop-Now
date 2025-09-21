@@ -8,6 +8,7 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firesbase";
+import {ClipLoader} from 'react-spinners'
 
 const SignIn = () => {
   // Creating the color variable
@@ -22,6 +23,7 @@ const SignIn = () => {
   //Use State Variables
   const [showPassword, setShowPassword] = useState(false);
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false)
 
   //Registration State Variables
   const [email, setEmail] = useState("");
@@ -29,6 +31,8 @@ const SignIn = () => {
 
   //Creating a Function that handles sign up
   const signInHandler = async () => {
+    setLoading(true)
+    setErr(null);
     try {
       //Calling axios
       const result = await axios.post(
@@ -43,10 +47,11 @@ const SignIn = () => {
         }
       );
       console.log(result);
-      setErr("");
+      
     } catch (error) {
       console.log(error);
       setErr(error?.response?.data?.message)
+      setLoading(false)
     }
   };
 
@@ -143,7 +148,8 @@ const SignIn = () => {
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
         >
-          Sign In
+          {loading ? <ClipLoader size={20} /> : "Sign In"}
+          
         </button>
          {err && (
           <p className="text-red-500 text-center my-[10px]">{err}</p>
