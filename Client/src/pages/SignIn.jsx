@@ -6,6 +6,8 @@ import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firesbase";
 
 const SignIn = () => {
   // Creating the color variable
@@ -15,10 +17,11 @@ const SignIn = () => {
   const borderColor = "#ddd";
 
   //Navigation
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //Use State Variables
   const [showPassword, setShowPassword] = useState(false);
+  const [err, setErr] = useState("");
 
   //Registration State Variables
   const [email, setEmail] = useState("");
@@ -40,8 +43,28 @@ const SignIn = () => {
         }
       );
       console.log(result);
+      setErr("");
     } catch (error) {
       console.log(error);
+      setErr(error?.response?.data?.message)
+    }
+  };
+
+  //Handle being able to login with google
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    try {
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        { email: result.user.email },
+        { withCredentials: true }
+      );
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+      setErr(error?.response?.data?.message)
     }
   };
 
@@ -107,8 +130,12 @@ const SignIn = () => {
               {!showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </button>
           </div>
-          <div className="text-left mt-2 mb-4 text-[#32CD32] cursor-pointer" 
-          onClick={()=> navigate('/forgot-password')}>Forgot Password</div>
+          <div
+            className="text-left mt-2 mb-4 text-[#32CD32] cursor-pointer"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot Password
+          </div>
         </div>
 
         <button
@@ -118,8 +145,12 @@ const SignIn = () => {
         >
           Sign In
         </button>
+         {err && (
+          <p className="text-red-500 text-center my-[10px]">{err}</p>
+        )}
 
         <button
+          onClick={handleGoogleAuth}
           className="w-full mt-4 flex items-center justify-center gap-2 border border-gray-400 rounded-lg
         px-4 py-2 transition duration-200 hover:bg-gray-100 cursor-pointer"
         >

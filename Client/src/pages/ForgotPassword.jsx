@@ -15,6 +15,7 @@ const ForgotPassword = () => {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [err, setErr] = useState("");
 
   //This functions will handle Forgot Password
   const handleSendOtp = async () => {
@@ -25,10 +26,11 @@ const ForgotPassword = () => {
         { withCredentials: true }
       );
       console.log(result);
+      setErr("");
       setStep(2);
     } catch (error) {
       console.error(error.response?.data || error.message);
-      alert(error.response?.data?.message || "Something went wrong");
+      setErr(error?.response?.data?.message);
     }
   };
 
@@ -40,10 +42,11 @@ const ForgotPassword = () => {
         { withCredentials: true }
       );
       console.log(result);
+      setErr("");
       setStep(3);
     } catch (error) {
       console.error(error.response?.data || error.message);
-      alert(error.response?.data?.message || "Something went wrong");
+      setErr(error?.response?.data?.message);
     }
   };
 
@@ -60,11 +63,13 @@ const ForgotPassword = () => {
         { email, newPassword },
         { withCredentials: true }
       );
+      setErr("");
       console.log(result);
       navigate("/signin");
+      setErr("");
     } catch (error) {
       console.error(error.response?.data || error.message);
-      alert(error.response?.data?.message || "Something went wrong");
+      setErr(error?.response?.data?.message);
     }
   };
 
@@ -110,6 +115,7 @@ const ForgotPassword = () => {
             >
               Send Otp
             </button>
+            {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
           </div>
         )}
 
@@ -142,6 +148,7 @@ const ForgotPassword = () => {
             >
               Verify
             </button>
+            {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
           </div>
         )}
 
@@ -192,6 +199,7 @@ const ForgotPassword = () => {
             >
               Reset Password
             </button>
+            {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
           </div>
         )}
       </div>

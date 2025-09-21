@@ -25,6 +25,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
 
   //Creating a Function that handles sign up
   const signUpHandler = async () => {
@@ -45,32 +46,38 @@ const SignUp = () => {
         }
       );
       console.log(result);
+      setErr("");
     } catch (error) {
-      console.log(error);
+      setErr(error?.response?.data?.message)
     }
   };
 
   //Sign Up with GOOGLE AUTH
   const handleGoogleAuth = async () => {
     if (!mobile) {
-      return alert("mobile is required")
+      return setErr("Phone No is required");
     }
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup(auth, provider)
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
 
     try {
-      const {data} = await axios.post(`${serverUrl}/api/auth/google-auth`, 
-        {fullName: result.user.displayName,
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        {
+          fullName: result.user.displayName,
           email: result.user.email,
           role,
-          mobile
-        }, {withCredentials: true}
-      )
-      console.log(data)
+          mobile,
+        },
+        { withCredentials: true }
+      );
+      console.log(data);
+      setErr('')
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      setErr(error?.response?.data?.message)
     }
-  }
+  };
 
   return (
     <div
@@ -207,9 +214,12 @@ const SignUp = () => {
         >
           Sign Up
         </button>
+        {err && (
+          <p className="text-red-500 text-center my-[10px]">{err}</p>
+        )}
 
         <button
-        onClick={handleGoogleAuth}
+          onClick={handleGoogleAuth}
           className="w-full mt-4 flex items-center justify-center gap-2 border border-gray-400 rounded-lg
         px-4 py-2 transition duration-200 hover:bg-gray-100 cursor-pointer"
         >
