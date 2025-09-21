@@ -4,6 +4,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { ClipLoader } from "react-spinners";
 
 const ForgotPassword = () => {
   //Navigation
@@ -16,9 +17,12 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   //This functions will handle Forgot Password
   const handleSendOtp = async () => {
+    setLoading(true);
+    setErr(null);
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/send-otp`,
@@ -26,15 +30,17 @@ const ForgotPassword = () => {
         { withCredentials: true }
       );
       console.log(result);
-      setErr("");
       setStep(2);
     } catch (error) {
       console.error(error.response?.data || error.message);
       setErr(error?.response?.data?.message);
+      setLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
+    setLoading(true);
+    setErr(null);
     try {
       const result = await axios.post(
         `${serverUrl}/api/auth/verify-otp`,
@@ -42,16 +48,18 @@ const ForgotPassword = () => {
         { withCredentials: true }
       );
       console.log(result);
-      setErr("");
       setStep(3);
     } catch (error) {
       console.error(error.response?.data || error.message);
       setErr(error?.response?.data?.message);
+      setLoading(false);
     }
   };
 
   const handlePasswordReset = async () => {
     //Check if password is = to confirm password
+    setLoading(true);
+    setErr(null);
     if (newPassword !== confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -63,13 +71,13 @@ const ForgotPassword = () => {
         { email, newPassword },
         { withCredentials: true }
       );
-      setErr("");
+
       console.log(result);
       navigate("/signin");
-      setErr("");
     } catch (error) {
       console.error(error.response?.data || error.message);
       setErr(error?.response?.data?.message);
+      setLoading(false);
     }
   };
 
@@ -112,8 +120,9 @@ const ForgotPassword = () => {
               onClick={handleSendOtp}
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
+              disabled={loading}
             >
-              Send Otp
+              {loading ? <ClipLoader size={20} /> : "Send Otp"}
             </button>
             {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
           </div>
@@ -145,8 +154,9 @@ const ForgotPassword = () => {
               onClick={handleVerifyOtp}
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
+              disabled={loading}
             >
-              Verify
+              {loading ? <ClipLoader size={20} /> : "Verify"}
             </button>
             {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
           </div>
@@ -196,8 +206,9 @@ const ForgotPassword = () => {
               onClick={handlePasswordReset}
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white mt-2`}
+              disabled={loading}
             >
-              Reset Password
+              {loading ? <ClipLoader size={20} /> : "Reset Password"}
             </button>
             {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
           </div>

@@ -8,7 +8,7 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firesbase.js";
-import {ClipLoader} from 'react-spinners'
+import { ClipLoader } from "react-spinners";
 
 const SignUp = () => {
   // Creating the color variable
@@ -27,11 +27,11 @@ const SignUp = () => {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   //Creating a Function that handles sign up
   const signUpHandler = async () => {
-    setLoading(true)
+    setLoading(true);
     setErr(null);
     try {
       //Calling axios
@@ -50,17 +50,14 @@ const SignUp = () => {
         }
       );
       console.log(result);
-      
-      
     } catch (error) {
-      setErr(error?.response?.data?.message)
-      setLoading(false)
+      setErr(error?.response?.data?.message);
+      setLoading(false);
     }
   };
 
   //Sign Up with GOOGLE AUTH
   const handleGoogleAuth = async () => {
-    
     if (!mobile) {
       return setErr("Phone No is required");
     }
@@ -79,11 +76,10 @@ const SignUp = () => {
         { withCredentials: true }
       );
       console.log(data);
-      setErr('')
-  
+      setErr("");
     } catch (error) {
       console.log(error);
-      setErr(error?.response?.data?.message)
+      setErr(error?.response?.data?.message);
     }
   };
 
@@ -216,18 +212,14 @@ const SignUp = () => {
           </div>
         </div>
         <button
-        disabled={loading}
+          disabled={loading}
           onClick={signUpHandler}
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer
         active:bg-white active:text-green-600 bg-[#32CD32] text-white`}
         >
           {loading ? <ClipLoader size={20} /> : "Sign Up"}
-          
-        
         </button>
-        {err && (
-          <p className="text-red-500 text-center my-[10px]">{err}</p>
-        )}
+        {err && <p className="text-red-500 text-center my-[10px]">{err}</p>}
 
         <button
           onClick={handleGoogleAuth}
