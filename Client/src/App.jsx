@@ -3,11 +3,13 @@ import { Route, Routes } from 'react-router-dom'
 import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import ForgotPassword from './pages/ForgotPassword'
+import useGetCurrentUser from './hooks/useGetCurrentUser'
 
 //Exporting Server URL so other pages can use it 
 export const serverUrl = 'http://localhost:5000'
 
 const App = () => {
+  useGetCurrentUser()
   return (
     <Routes>
       <Route path='/signup' element={<SignUp />} />
