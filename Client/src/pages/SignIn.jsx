@@ -9,6 +9,8 @@ import { serverUrl } from "../App";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firesbase";
 import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice.js";
 
 const SignIn = () => {
   // Creating the color variable
@@ -24,6 +26,7 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch()
 
   //Registration State Variables
   const [email, setEmail] = useState("");
@@ -46,7 +49,7 @@ const SignIn = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log(result);
+      dispatch(setUserData(result.data))
     } catch (error) {
       console.log(error);
       setErr(error?.response?.data?.message);
@@ -65,7 +68,7 @@ const SignIn = () => {
         { email: result.user.email },
         { withCredentials: true }
       );
-      console.log(data);
+      dispatch(setUserData(data))
     } catch (error) {
       console.log(error);
       setErr(error?.response?.data?.message);
