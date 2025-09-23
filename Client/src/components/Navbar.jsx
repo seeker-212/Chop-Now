@@ -2,16 +2,34 @@ import React, { use, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 import { FiShoppingCart } from "react-icons/fi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RxCross2 } from "react-icons/rx";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { setUserData } from "../redux/userSlice";
 
 const Navbar = () => {
   //Will get the user info from the UserSlice
-  const { userData } = useSelector((state) => state.user);
+  const { userData, city } = useSelector((state) => state.user);
 
   //Use State variable
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+
+  //Dispatch
+  const dispatch = useDispatch();
+
+  // This function will handle user Logout
+  const logoutHandler = async () => {
+    try {
+      const result = await axios.get(`${serverUrl}/api/auth/signout`, {
+        withCredentials: true,
+      });
+      dispatch(setUserData(null));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div
@@ -29,7 +47,7 @@ const Navbar = () => {
         border-gray-300"
           >
             <FaLocationDot size={25} className="text-[#32CD32]" />
-            <div className="w-[80%] truncate text-gray-600">Nnewi</div>
+            <div className="w-[80%] truncate text-gray-600">{city}</div>
           </div>
           <div className="w-[80%] flex items-center gap-[10px]">
             <IoIosSearch size={25} className="text-[#32CD32]" />
@@ -55,7 +73,7 @@ const Navbar = () => {
         border-gray-300"
         >
           <FaLocationDot size={25} className="text-[#32CD32]" />
-          <div className="w-[80%] truncate text-gray-600">Nnewi</div>
+          <div className="w-[80%] truncate text-gray-600">{city}</div>
         </div>
         <div className="w-[80%] flex items-center gap-[10px]">
           <IoIosSearch size={25} className="text-[#32CD32]" />
@@ -116,7 +134,10 @@ const Navbar = () => {
             <div className="md:hidden text-[#32CD32] font-semibold cursor-pointer">
               My Orders
             </div>
-            <div className="text-[#32CD32] font-semibold cursor-pointer">
+            <div
+              onClick={logoutHandler}
+              className="text-[#32CD32] font-semibold cursor-pointer"
+            >
               Log Out
             </div>
           </div>
