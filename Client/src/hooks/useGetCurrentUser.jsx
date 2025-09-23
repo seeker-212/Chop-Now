@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { serverUrl } from "../App";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setUserData } from "../redux/userSlice.js";
+import { setLoading, setUserData } from "../redux/userSlice.js";
 
 const useGetCurrentUser = () => {
   //Use Dispatch
@@ -19,6 +19,8 @@ const useGetCurrentUser = () => {
         dispatch(setUserData(result.data));
       } catch (error) {
         console.error(error);
+      } finally {
+        dispatch(setLoading(false));
       }
     };
     fetchUser();
