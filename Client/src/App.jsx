@@ -7,6 +7,8 @@ import useGetCurrentUser from "./hooks/useGetCurrentUser";
 import { useSelector } from "react-redux";
 import Home from "./pages/Home";
 import useGetCity from "./hooks/useGetCity";
+import useGetMyShop from "./hooks/useGetMyShop";
+import CreateEditShop from "./pages/CreateEditShop";
 
 //Exporting Server URL so other pages can use it
 export const serverUrl = "http://localhost:5000";
@@ -14,6 +16,7 @@ export const serverUrl = "http://localhost:5000";
 const App = () => {
   useGetCurrentUser();
   useGetCity();
+  useGetMyShop
   const { userData, loading } = useSelector((state) => state.user);
 
   if (loading) {
@@ -40,6 +43,10 @@ const App = () => {
       <Route
         path="/"
         element={userData ? <Home /> : <Navigate to={"/signin"} />}
+      />
+      <Route
+        path="/create-edit-shop"
+        element={userData ? <CreateEditShop /> : <Navigate to={"/signin"} />}
       />
     </Routes>
   );

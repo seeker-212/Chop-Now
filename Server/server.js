@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import authRouter from './routes/authRoute.js';
 import cors from 'cors'
 import userRouter from './routes/userRoutes.js';
+import shopRouter from './routes/shopRoute.js';
+import itemRouter from './routes/itemRoute.js';
 
 // Making Necessary connections
 connectDB()
@@ -25,6 +27,8 @@ app.use(cookieParser())
 //Calling Endpoints
 app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
+app.use('/api/shop', shopRouter)
+app.use('/api/item', itemRouter)
 
 //Check if Api is working
 app.use('/', (req, res) => (res.send('Api is working')))

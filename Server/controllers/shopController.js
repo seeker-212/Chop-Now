@@ -31,3 +31,20 @@ export const createEditShop = async (req, res) => {
         return res.status(500).json({message: `Error creating shop ${error}`})
     }
 }
+
+
+// This will get logged in owners shop
+export const getMyShop = async (req, res) => {
+    try {
+        const shop = await Shop.findOne({owner: req.userId})
+
+        //check if shop is available
+        if (!shop) {
+            return null
+        }
+        return res.status(200).json(shop)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message: `Finding shop error ${error}`})
+    }
+}
