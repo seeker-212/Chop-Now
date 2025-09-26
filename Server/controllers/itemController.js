@@ -13,7 +13,7 @@ export const addItem = async (req, res) => {
     }
 
     //Linking the item to the [Shop]
-    const shop = await Shop.findOne({ owner: req.userId });
+    const shop = await Shop.findOne({ owner: req.userId })
 
     //Check if shop exist, if it doesn't throw in error
     if (!shop) {
@@ -30,7 +30,11 @@ export const addItem = async (req, res) => {
       shop: shop._id,
     });
 
-    return res.status(201).json(item);
+    shop.items.push(item._id)
+    await shop.save()
+    await shop.populate("items owner")
+
+    return res.status(201).json(shop);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: `Error adding item ${error}` });

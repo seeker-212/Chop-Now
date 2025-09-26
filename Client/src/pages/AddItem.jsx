@@ -7,30 +7,38 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { setMyShopData } from "../redux/ownerSlice.js";
 
-const CreateEditShop = () => {
+const AddItem = () => {
   //Navigator
   const navigate = useNavigate();
 
   //Getting Data from MYSHOPSLICE
   const { myShopData } = useSelector((state) => state.owner);
-  const { city, state, currentAddress } = useSelector((state) => state.user);
 
   //useState variables
-  const [name, setName] = useState(myShopData?.name || "");
-  const [currentcity, setCurrentCity] = useState(
-    myShopData?.city || city || ""
-  );
-  const [currentState, setCurrentState] = useState(
-    myShopData?.state || state || ""
-  );
-  const [address, setAddress] = useState(
-    myShopData?.address || currentAddress || ""
-  );
-  const [frontendImage, setFrontendImage] = useState(myShopData?.image || null);
+  const [name, setName] = useState("");
+  const [frontendImage, setFrontendImage] = useState(null);
   const [backendImage, setBackendImage] = useState(null);
+  const [price, setPrice] = useState(0);
+  const [category, setCategory] = useState("");
+  const [foodType, setFoodType] = useState("veg");
+
+  //Creating a CATEGORY ARRAY
+  const categories = [
+    "Snacks",
+    "Main Course",
+    "Desserts",
+    "Pizza",
+    "Burgers",
+    "Sandwiches",
+    "Eastern Naija",
+    "Southern Naija",
+    "chinese",
+    "Fast Food",
+    "Others",
+  ];
 
   //UseDispatch
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // This function handles image uploading on the frontend
   const handleImage = (e) => {
@@ -45,24 +53,23 @@ const CreateEditShop = () => {
     try {
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("city", city);
-      formData.append("state", state);
-      formData.append("address", address);
+      formData.append("category", category);
+      formData.append("foodType", foodType);
+      formData.append("price", price);
 
       //Checking if backend has the image available
       if (backendImage) {
         formData.append("image", backendImage);
       }
-      console.log([...formData]);
       const result = await axios.post(
-        `${serverUrl}/api/shop/create-edit`,
+        `${serverUrl}/api/item/add-item`,
         formData,
         { withCredentials: true }
       );
-      dispatch(setMyShopData(result?.data))
-      console.log(result.data)
+      dispatch(setMyShopData(result.data));
+      console.log(result.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -86,13 +93,12 @@ const CreateEditShop = () => {
           <div className="bg-green-100 p-4 rounded-full mb-4">
             <FaUtensils className="text-[#32CD32] w-16 h-16" />
           </div>
-          <div className="text-3xl font-extrabold text-gray-900">
-            {myShopData ? "Edit Shop" : "Add Shop"}
-          </div>
+          <div className="text-3xl font-extrabold text-gray-900">Add Food</div>
         </div>
 
         {/* Form Section */}
         <form onSubmit={submitHandler} className="space-y-5">
+          {/* NAME SECTION */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Name
@@ -101,15 +107,15 @@ const CreateEditShop = () => {
               onChange={(e) => setName(e.target.value)}
               value={name}
               type="text"
-              placeholder="Enter Shop Name"
+              placeholder="Enter Food Name"
               className="w-full px-4 py-3
                 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
-
+          {/* FOOD IMAGE SECTION */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Shop Image
+              Food Image
             </label>
             <input
               onChange={handleImage}
@@ -129,50 +135,54 @@ const CreateEditShop = () => {
               </div>
             )}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                City
-              </label>
-              <input
-                onChange={(e) => setCurrentCity(e.target.value)}
-                value={currentcity}
-                type="text"
-                placeholder="City"
-                className="w-full px-4 py-3
-                border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                State
-              </label>
-              <input
-                onChange={(e) => setCurrentState(e.target.value)}
-                value={currentState}
-                type="text"
-                placeholder="State"
-                className="w-full px-4 py-3
-                border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-          </div>
-
+          {/* PRICE SECTION */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address
+              Price
             </label>
             <input
-              onChange={(e) => setAddress(e.target.value)}
-              value={address}
-              type="text"
-              placeholder="Enter Shop Address"
+              onChange={(e) => setPrice(e.target.value)}
+              value={price}
+              type="number"
+              placeholder="0"
               className="w-full px-4 py-3
                 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
-
+          {/* CATEGORY SECTION */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Available Food Category
+            </label>
+            <select
+              onChange={(e) => setCategory(e.target.value)}
+              value={category}
+              className="w-full px-4 py-3
+                border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+                <option value="">select category</option>
+                {categories.map((cate, index) => (
+                    <option value={cate} key={index}>{cate}</option>
+                ))}
+            </select>
+          </div>
+          {/* FOODTYPE SECTION */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select FoodType
+            </label>
+            <select
+              onChange={(e) => setFoodType(e.target.value)}
+              value={foodType}
+              className="w-full px-4 py-3
+                border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+                <option value="veg">Veg</option>
+                <option value="non veg">Non Veg</option>
+                
+            </select>
+          </div>
+          {/* SUBMIT BUTTON */}
           <button
             type="submit"
             className="w-full bg-[#32CD32] text-white px-6 py-3 rounded-lg font-semibold
@@ -187,4 +197,4 @@ const CreateEditShop = () => {
   );
 };
 
-export default CreateEditShop;
+export default AddItem;

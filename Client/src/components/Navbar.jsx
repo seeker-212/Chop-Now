@@ -13,7 +13,7 @@ import { TbReceipt2 } from "react-icons/tb";
 const Navbar = () => {
   //Will get the user info from the UserSlice
   const { userData, city } = useSelector((state) => state.user);
-  const { myshopData } = useSelector((state) => state.owner);
+  const { myShopData } = useSelector((state) => state.owner);
 
   //Use State variable
   const [showInfo, setShowInfo] = useState(false);
@@ -112,7 +112,7 @@ const Navbar = () => {
         {/* Button  is meant for Shop owner and it add food items */}
         {userData.role === "owner" ? (
           <>
-            {myshopData && (
+            {myShopData && (
               <>
                 <button
                   className="hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full

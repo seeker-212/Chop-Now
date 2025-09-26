@@ -3,7 +3,12 @@ import { useEffect } from "react";
 import { serverUrl } from "../App";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setCity, setCurrentAddress, setState, setUserData } from "../redux/userSlice.js";
+import {
+  setCity,
+  setCurrentAddress,
+  setState,
+  setUserData,
+} from "../redux/userSlice.js";
 
 const useGetCity = () => {
   //Use Dispatch
@@ -29,8 +34,12 @@ const useGetCity = () => {
 
         dispatch(setCity(result?.data?.results[0].city));
         dispatch(setState(result?.data?.results[0].state));
-        dispatch(setCurrentAddress(result?.data?.results[0].address))
-        console.log(result?.data)
+        dispatch(
+          setCurrentAddress(
+            result?.data?.results[0].address_line2 ||
+              result?.data?.results[0].address_line1
+          )
+        );
       },
       (error) => {
         console.error("Geolocation error:", error);

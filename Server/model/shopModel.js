@@ -12,7 +12,7 @@ const shopSchema = new mongoose.Schema(
     city: { type: String, required: true },
     state: { type: String, required: true },
     address: { type: String, required: true },
-    item: { type: mongoose.Schema.Types.ObjectId, ref: "Item", required: true },
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item"}],
   },
   { timestamps: true }
 );
