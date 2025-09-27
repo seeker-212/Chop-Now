@@ -1,11 +1,13 @@
 import React, { useRef, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaUtensils } from "react-icons/fa";
 import axios from "axios";
 import { serverUrl } from "../App";
 import { setMyShopData } from "../redux/ownerSlice.js";
+import { useEffect } from "react";
+import { ClipLoader } from "react-spinners";
 
 const EditItem = () => {
   //Navigator
@@ -14,13 +16,19 @@ const EditItem = () => {
   //Getting Data from MYSHOPSLICE
   const { myShopData } = useSelector((state) => state.owner);
 
+  //UseParams
+  const { itemId } = useParams();
+
   //useState variables
+  const [currrentItem, setCurrentItem] = useState(null)
   const [name, setName] = useState("");
-  const [frontendImage, setFrontendImage] = useState(null);
+  const [frontendImage, setFrontendImage] = useState("");
   const [backendImage, setBackendImage] = useState(null);
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState("");
-  const [foodType, setFoodType] = useState("veg");
+  const [foodType, setFoodType] = useState("");
+  const [loading, setLoading] = useState(false) 
+  
 
   //Creating a CATEGORY ARRAY
   const categories = [
@@ -50,6 +58,7 @@ const EditItem = () => {
   //This function will handle the form submision
   const submitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -62,16 +71,45 @@ const EditItem = () => {
         formData.append("image", backendImage);
       }
       const result = await axios.post(
-        `${serverUrl}/api/item/add-item`,
+        `${serverUrl}/api/item/edit-item/${itemId}`,
         formData,
         { withCredentials: true }
       );
       dispatch(setMyShopData(result.data));
-      console.log(result.data);
+      setLoading(false)
+      navigate('/')
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
+
+  //UseEffects Sections
+  useEffect(() => {
+    const handleGetItemById = async () => {
+      try {
+        const result = await axios.get(
+          `${serverUrl}/api/item/get-by-id/${itemId}`,
+          { withCredentials: true }
+        );
+        setCurrentItem(result.data)
+        
+      } catch (error) {
+        console.log(error)
+      }
+    };
+    handleGetItemById()
+  }, [itemId]);
+
+  //This current useEffect will diplay the availble data on the form
+  useEffect(()=>{
+    setName(currrentItem?.name || "")
+    setPrice(currrentItem?.price || 0)
+    setCategory(currrentItem?.category || "")
+    setFoodType(currrentItem?.foodType || "")
+    setFrontendImage(currrentItem?.image || "")
+    
+  },[currrentItem])
 
   return (
     <div
@@ -93,7 +131,7 @@ const EditItem = () => {
           <div className="bg-green-100 p-4 rounded-full mb-4">
             <FaUtensils className="text-[#32CD32] w-16 h-16" />
           </div>
-          <div className="text-3xl font-extrabold text-gray-900">Add Food</div>
+          <div className="text-3xl font-extrabold text-gray-900">Edit Food</div>
         </div>
 
         {/* Form Section */}
@@ -160,10 +198,12 @@ const EditItem = () => {
               className="w-full px-4 py-3
                 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-                <option value="">select category</option>
-                {categories.map((cate, index) => (
-                    <option value={cate} key={index}>{cate}</option>
-                ))}
+              <option value="">select category</option>
+              {categories.map((cate, index) => (
+                <option value={cate} key={index}>
+                  {cate}
+                </option>
+              ))}
             </select>
           </div>
           {/* FOODTYPE SECTION */}
@@ -177,9 +217,8 @@ const EditItem = () => {
               className="w-full px-4 py-3
                 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-                <option value="veg">Veg</option>
-                <option value="non veg">Non Veg</option>
-                
+              <option value="veg">Veg</option>
+              <option value="non veg">Non Veg</option>
             </select>
           </div>
           {/* SUBMIT BUTTON */}
@@ -188,8 +227,9 @@ const EditItem = () => {
             className="w-full bg-[#32CD32] text-white px-6 py-3 rounded-lg font-semibold
           shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-200
           cursor-pointer"
+          disabled={loading}
           >
-            Save
+            {loading ? <ClipLoader size={20} color="white" /> : "Save"}
           </button>
         </form>
       </div>

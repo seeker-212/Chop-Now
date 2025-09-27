@@ -6,6 +6,7 @@ import { FaUtensils } from "react-icons/fa";
 import axios from "axios";
 import { serverUrl } from "../App";
 import { setMyShopData } from "../redux/ownerSlice.js";
+import { ClipLoader } from "react-spinners";
 
 const AddItem = () => {
   //Navigator
@@ -21,6 +22,7 @@ const AddItem = () => {
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState("");
   const [foodType, setFoodType] = useState("veg");
+  const [loading, setLoading] = useState(false)
 
   //Creating a CATEGORY ARRAY
   const categories = [
@@ -50,6 +52,7 @@ const AddItem = () => {
   //This function will handle the form submision
   const submitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -67,9 +70,11 @@ const AddItem = () => {
         { withCredentials: true }
       );
       dispatch(setMyShopData(result.data));
-      console.log(result.data);
+      setLoading(false)
+      navigate('/')
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
 
@@ -188,8 +193,9 @@ const AddItem = () => {
             className="w-full bg-[#32CD32] text-white px-6 py-3 rounded-lg font-semibold
           shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-200
           cursor-pointer"
+          disabled={loading}
           >
-            Save
+            {loading ? <ClipLoader size={20} color="white" />: "Create Item" }
           </button>
         </form>
       </div>

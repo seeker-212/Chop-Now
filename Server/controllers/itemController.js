@@ -13,7 +13,7 @@ export const addItem = async (req, res) => {
     }
 
     //Linking the item to the [Shop]
-    const shop = await Shop.findOne({ owner: req.userId })
+    const shop = await Shop.findOne({ owner: req.userId });
 
     //Check if shop exist, if it doesn't throw in error
     if (!shop) {
@@ -30,9 +30,9 @@ export const addItem = async (req, res) => {
       shop: shop._id,
     });
 
-    shop.items.push(item._id)
-    await shop.save()
-    await shop.populate("items owner")
+    shop.items.push(item._id);
+    await shop.save();
+    await shop.populate("items owner");
 
     return res.status(201).json(shop);
   } catch (error) {
@@ -67,9 +67,29 @@ export const editItem = async (req, res) => {
       return res.status(400).json({ message: "Item not found" });
     }
 
-    return res.status(200).json(item);
+    //Creating a variable that will find Item from the shop
+    const shop = await Shop.findOne({ owner: req.userId }).populate("items");
+    return res.status(200).json(shop);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: `Error Editing item ${error}` });
+  }
+};
+
+//------------This controller will get the Item by Id------------
+export const getItemById = async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+    const item = await Item.findById(itemId);
+
+    //Chcking if the item is available
+    if (!item) {
+      return res.status(400).json({ message: "Item not found" });
+    }
+
+    //But if the Item is available
+    return res.status(200).json(item);
+  } catch (error) {
+    return res.status(500).json({ message: `Error Getting item ${error}` });
   }
 };
