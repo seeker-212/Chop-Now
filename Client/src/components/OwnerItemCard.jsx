@@ -11,7 +11,7 @@ const OwnerItemCard = ({ data }) => {
       className="flex bg-white rounded-lg shadow-md overflow-hidden border border-[#32CD32]
     w-full max-w-2xl"
     >
-      <div className="w-36 h-full flex-shrink-0 bg-gray-50">
+      <div className="w-36 flex-shrink-0 bg-gray-50">
         <img src={data.image} alt="" className="w-full h-full object-cover" />
       </div>
       <div className="flex flex-col justify-between p-3 flex-1">

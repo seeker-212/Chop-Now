@@ -4,7 +4,6 @@ import Shop from "../model/shopModel.js";
 //Creating and Editing Shop [CONTROLLER]
 export const createEditShop = async (req, res) => {
   try {
-
     // getting data from the form body
     const { name, city, state, address } = req.body;
     let image;
@@ -48,7 +47,12 @@ export const createEditShop = async (req, res) => {
 // This will get logged in owners shop
 export const getMyShop = async (req, res) => {
   try {
-    const shop = await Shop.findOne({ owner: req.userId }).populate("items")
+    const shop = await Shop.findOne({ owner: req.userId })
+      .populate("owner")
+      .populate({
+        path: "items",
+        options: { sort: { updatedAt: -1 } },
+      });
 
     //check if shop is available
     if (!shop) {

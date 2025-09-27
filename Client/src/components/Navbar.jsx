@@ -9,6 +9,7 @@ import { serverUrl } from "../App";
 import { setUserData } from "../redux/userSlice";
 import { FaPlus } from "react-icons/fa";
 import { TbReceipt2 } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   //Will get the user info from the UserSlice
@@ -21,6 +22,9 @@ const Navbar = () => {
 
   //Dispatch
   const dispatch = useDispatch();
+
+  //Navigator
+  const navigate = useNavigate();
 
   // This function will handle user Logout
   const logoutHandler = async () => {
@@ -115,6 +119,7 @@ const Navbar = () => {
             {myShopData && (
               <>
                 <button
+                  onClick={() => navigate("/add-food")}
                   className="hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full
               bg-[#32CD32]/10 text-[#32CD32]"
                 >
@@ -124,6 +129,7 @@ const Navbar = () => {
 
                 {/* Making the button visible for smaller screen  */}
                 <button
+                  onClick={() => navigate("/add-food")}
                   className="md:hidden flex items-center gap-1 p-2 cursor-pointer rounded-full
               bg-[#32CD32]/10 text-[#32CD32]"
                 >
