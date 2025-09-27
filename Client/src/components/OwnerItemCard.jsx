@@ -2,10 +2,29 @@ import React from "react";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Item from "../../../Server/model/itemModel";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { useDispatch } from "react-redux";
+import { setMyShopData } from "../redux/ownerSlice";
 
 const OwnerItemCard = ({ data }) => {
-    //Navigate 
-    const navigate = useNavigate()
+  //Navigate
+  const navigate = useNavigate();
+
+  //Dispatch
+  const dispatch = useDispatch();
+
+  //This function will handle Item Deletion
+  const deleteItemHandler = async () => {
+    try {
+      const result = await axios.get(`${serverUrl}/api/item/delete/${data._id}`, {
+        withCredentials: true,
+      });
+      dispatch(setMyShopData(result.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div
       className="flex bg-white rounded-lg shadow-md overflow-hidden border border-[#32CD32]
@@ -29,16 +48,21 @@ const OwnerItemCard = ({ data }) => {
           </p>
         </div>
         <div className="flex items-center justify-between">
-            <div className="text-[#32CD32] font-bold">{data.price}</div>
-            <div className="flex items-center gap-2">
-                <div className="cursor-pointer p-2 rounded-full hover:bg-[#32CD32]/10 text-[#32CD32]"
-                onClick={()=> navigate(`/edit-item/${data._id}`)}>
-                    <FaPen size={16} />
-                </div>
-                <div className="cursor-pointer p-2 rounded-full hover:bg-[#32CD32]/10 text-[#32CD32]">
-                    <FaTrash size={16} />
-                </div>
+          <div className="text-[#32CD32] font-bold">{data.price}</div>
+          <div className="flex items-center gap-2">
+            <div
+              className="cursor-pointer p-2 rounded-full hover:bg-[#32CD32]/10 text-[#32CD32]"
+              onClick={() => navigate(`/edit-item/${data._id}`)}
+            >
+              <FaPen size={16} />
             </div>
+            <div
+              className="cursor-pointer p-2 rounded-full hover:bg-[#32CD32]/10 text-[#32CD32]"
+              onClick={deleteItemHandler}
+            >
+              <FaTrash size={16} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

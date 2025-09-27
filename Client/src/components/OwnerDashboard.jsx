@@ -11,8 +11,6 @@ const OwnerDashboard = () => {
 
   const navigate = useNavigate();
 
-  console.log(myShopData)
-
   return (
     <div className="w-[100vw] min-h-[100vh]  flex flex-col items-center bg-[#fff9f6]">
       <Navbar />
