@@ -7,12 +7,20 @@ import { FaPen } from "react-icons/fa";
 import OwnerItemCard from "./ownerItemCard";
 
 const OwnerDashboard = () => {
-  const { myShopData } = useSelector((state) => state.owner);
+  const { myShopData, ownerLoading } = useSelector((state) => state.owner);
 
   const navigate = useNavigate();
 
+  if (ownerLoading) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        <p>Loading shop...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-[100vw] min-h-[100vh]  flex flex-col items-center bg-[#fff9f6]">
+    <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto">
       <Navbar />
 
       {!myShopData && (

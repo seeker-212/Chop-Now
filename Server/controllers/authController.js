@@ -63,7 +63,7 @@ export const signIn = async (req, res) => {
   try {
     //Getting the data from the form body
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("shop");
 
     //Checking if User does not Exist
     if (!user) {
@@ -85,7 +85,7 @@ export const signIn = async (req, res) => {
       httpOnly: true,
     });
 
-    // Send user without password
+    // Strip password before sending
     const { password: _, ...userWithoutPassword } = user._doc;
 
     res.status(200).json(userWithoutPassword);

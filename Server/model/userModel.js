@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema(
     otpExpires: {
       type: Date,
     },
+    shop: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Shop",
+    },
   },
   { timestamps: true }
 );
