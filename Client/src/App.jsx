@@ -24,8 +24,9 @@ const App = () => {
   useGetShopByCity();
   useGetItemByCity();
   const { userData, loading } = useSelector((state) => state.user);
-
-  if (loading) {
+  const { ownerLoading } = useSelector((state) => state.owner);
+  const isLoading = loading || ownerLoading;
+  if (isLoading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
         Loading...

@@ -207,8 +207,8 @@ export  const googleAuth = async (req, res) => {
      const token = await genToken(user._id);
     res.cookie("token", token, {
       secure: false,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 1000,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
 
@@ -217,6 +217,6 @@ export  const googleAuth = async (req, res) => {
     res.status(201).json(user);
   } catch (error) {
     console.log(error);
-    res.status(500).json(`Creating Account with error Google${error}`);
+    res.status(500).json({ message: `Google signup error: ${error.message}` });
   }
 }

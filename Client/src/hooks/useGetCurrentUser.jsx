@@ -12,6 +12,7 @@ const useGetCurrentUser = () => {
   //This useEffect fetches the current logged in user
   useEffect(() => {
     const fetchUser = async () => {
+      dispatch(setLoading(true));
       try {
         const result = await axios.get(`${serverUrl}/api/user/current-user`, {
           withCredentials: true,
@@ -24,7 +25,7 @@ const useGetCurrentUser = () => {
       }
     };
     fetchUser();
-  }, []);
+  }, [dispatch]);
 };
 
 export default useGetCurrentUser;

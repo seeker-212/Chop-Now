@@ -82,7 +82,11 @@ const SignUp = () => {
       setErr("");
     } catch (error) {
       console.log(error);
-      setErr(error?.response?.data?.message);
+      const message =
+      error?.response?.data?.message ||
+      error?.response?.data || // in case backend sends string
+      "Something went wrong during Google signup";
+      setErr(message);
     }
   };
 
