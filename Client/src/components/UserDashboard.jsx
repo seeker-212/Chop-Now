@@ -8,7 +8,9 @@ import FoodCard from "./FoodCard";
 
 const UserDashboard = () => {
   //Destructing
-  const { city, shopInMyCity, itemInMyCity } = useSelector((state) => state.user);
+  const { city, shopInMyCity, itemInMyCity } = useSelector(
+    (state) => state.user
+  );
 
   //USEREF
   const cateScrollRef = useRef();
@@ -43,57 +45,40 @@ const UserDashboard = () => {
 
   //UseEffect
   useEffect(() => {
-    if (cateScrollRef.current) {
-      () => {
-        //Category Scroll
-        updateButton(
-          cateScrollRef,
-          setShowLeftCateButton,
-          setShowRightCateButton
-        );
-
-        //Shop Scroll
-        updateButton(
-          shopScrollRef,
-          setShowLeftShopButton,
-          setShowRightShopButton
-        );
-      };
-      cateScrollRef.current.addEventListener("scroll", () => {
-        //Category scroll Event
-        updateButton(
-          cateScrollRef,
-          setShowLeftCateButton,
-          setShowRightCateButton
-        );
-      });
-
-      shopScrollRef.current.addEventListener("scroll", () => {
-        //Shop scroll Event
-        updateButton(
-          shopScrollRef,
-          setShowLeftShopButton,
-          setShowRightShopButton
-        );
-      });
-    }
-    return () => {
-      cateScrollRef.current.removeEventListener("scroll", () => {
-        updateButton(
-          cateScrollRef,
-          setShowLeftCateButton,
-          setShowRightCateButton
-        );
-      });
-      shopScrollRef.current.removeEventListener("scroll", () => {
-        updateButton(
-          shopScrollRef,
-          setShowLeftShopButton,
-          setShowRightShopButton
-        );
-      });
+    const handleCateScroll = () => {
+      updateButton(
+        cateScrollRef,
+        setShowLeftCateButton,
+        setShowRightCateButton
+      );
     };
-  }, [categories, shopInMyCity]);
+
+    const handleShopScroll = () => {
+      updateButton(
+        shopScrollRef,
+        setShowLeftShopButton,
+        setShowRightShopButton
+      );
+    };
+
+    if (cateScrollRef.current) {
+      handleCateScroll(); // run once on mount
+      cateScrollRef.current.addEventListener("scroll", handleCateScroll);
+    }
+    if (shopScrollRef.current) {
+      handleShopScroll(); // run once on mount
+      shopScrollRef.current.addEventListener("scroll", handleShopScroll);
+    }
+
+    return () => {
+      if (cateScrollRef.current) {
+        cateScrollRef.current.removeEventListener("scroll", handleCateScroll);
+      }
+      if (shopScrollRef.current) {
+        shopScrollRef.current.removeEventListener("scroll", handleShopScroll);
+      }
+    };
+  }, [shopInMyCity, itemInMyCity]); // listen for state updates
 
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto">
@@ -120,7 +105,11 @@ const UserDashboard = () => {
             ref={cateScrollRef}
           >
             {categories.map((cate, index) => (
-              <CategoryCard name={cate.category} image={cate.image} key={index} />
+              <CategoryCard
+                name={cate.category}
+                image={cate.image}
+                key={index}
+              />
             ))}
           </div>
           {showRightCateButton && (
@@ -178,7 +167,7 @@ const UserDashboard = () => {
         </h1>
         <div className="w-full h-auto flex flex-wrap gap-[20px] justify-center">
           {itemInMyCity?.map((item, index) => (
-            <FoodCard data={item} key={index}/>
+            <FoodCard data={item} key={index} />
           ))}
         </div>
       </div>
