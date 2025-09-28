@@ -64,3 +64,21 @@ export const getMyShop = async (req, res) => {
     return res.status(500).json({ message: `Finding shop error ${error}` });
   }
 };
+
+//------------ Get Shop Controller ------------
+export const getShopByCity = async (req, res) => {
+  try {
+    const  {city} = req.params
+
+    const shops = await Shop.find({
+      city:{$regex: new RegExp(`^${city}$`, 'i')}
+    }).populate('items')
+    //If the shop is not available throw new error
+    if (!shops) {
+      return res.status(400).json({message: "shops not found"})
+    }
+    return res.status(200).json(shops)
+  } catch (error) {
+    return res.status(500).json({ message: `Getting shop by city error ${error}` });
+  }
+}

@@ -54,7 +54,7 @@ const OwnerDashboard = () => {
         <div className="w-full flex flex-col items-center gap-6 px-4 sm:px-6">
           <h1
             className="text-2xl sm:text-3xl text-gray-900 flex items-center gap-3
-           text-center mt-8"
+           text-center"
           >
             <FaUtensils className="text-[#32CD32] w-8 h-8 sm:w-10 sm:h-20" />
             Welcome to {myShopData.name}
