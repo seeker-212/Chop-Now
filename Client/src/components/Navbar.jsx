@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   //Will get the user info from the UserSlice
-  const { userData, city } = useSelector((state) => state.user);
+  const { userData, city, cartItems } = useSelector((state) => state.user);
   const { myShopData } = useSelector((state) => state.owner);
 
   //Use State variable
@@ -174,7 +174,7 @@ const Navbar = () => {
             <div className="relative cursor-pointer">
               <FiShoppingCart size={25} className="text-[#32CD32]" />
               <span className="absolute right-[-9px] top-[-12px] text-[#32CD32]">
-                0
+               {cartItems.length}
               </span>
             </div>
 

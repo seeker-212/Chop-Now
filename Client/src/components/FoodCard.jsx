@@ -8,8 +8,16 @@ import {
   FaStar,
 } from "react-icons/fa";
 import { FaRegStar } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/userSlice";
 
 const FoodCard = ({ data }) => {
+  //USESELECTOR
+  const { cartItems } = useSelector((state) => state.user);
+
+  //USEDISPATCH
+  const dispatch = useDispatch();
+
   const [quantity, setQuantity] = useState(0);
 
   //Star Rating
@@ -79,13 +87,30 @@ const FoodCard = ({ data }) => {
 
         <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
           <button className="px-2 pt-1 hover: bg-gray-100 transition">
-            <FaMinus size={12} color="red" onClick={handleDecrease}/>
+            <FaMinus size={12} color="red" onClick={handleDecrease} />
           </button>
           <span>{quantity}</span>
           <button className="px-2 pt-1 hover: bg-gray-100 transition">
-            <FaPlus size={12} color="green" onClick={handleIncrease}/>
+            <FaPlus size={12} color="green" onClick={handleIncrease} />
           </button>
-          <button className="text-white px-3 py-2 transition-colors bg-[#32CD32]">
+          <button
+            onClick={() =>
+              dispatch(
+                addToCart({
+                  id: data._id,
+                  name: data.name,
+                  price: data.price,
+                  image: data.image,
+                  shop: data.shop,
+                  quantity,
+                  foodType: data.foodType,
+                })
+              )
+            }
+            className={`${cartItems.some(
+              (i) => i.id === data._id
+            ) ? 'bg-gray-800' : 'bg-[#32CD32]'} text-white px-3 py-2 transition-colors cursor-pointer `}
+          >
             <FaShoppingCart size={16} />
           </button>
         </div>
