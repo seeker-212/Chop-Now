@@ -171,10 +171,13 @@ const Navbar = () => {
           <>
             {/* This shopping cart section */}
 
-            <div className="relative cursor-pointer">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => navigate("/cart")}
+            >
               <FiShoppingCart size={25} className="text-[#32CD32]" />
               <span className="absolute right-[-9px] top-[-12px] text-[#32CD32]">
-               {cartItems.length}
+                {cartItems.length}
               </span>
             </div>
 

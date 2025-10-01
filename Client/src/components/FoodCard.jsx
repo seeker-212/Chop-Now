@@ -94,22 +94,26 @@ const FoodCard = ({ data }) => {
             <FaPlus size={12} color="green" onClick={handleIncrease} />
           </button>
           <button
-            onClick={() =>
-              dispatch(
-                addToCart({
-                  id: data._id,
-                  name: data.name,
-                  price: data.price,
-                  image: data.image,
-                  shop: data.shop,
-                  quantity,
-                  foodType: data.foodType,
-                })
-              )
-            }
-            className={`${cartItems.some(
-              (i) => i.id === data._id
-            ) ? 'bg-gray-800' : 'bg-[#32CD32]'} text-white px-3 py-2 transition-colors cursor-pointer `}
+            onClick={() => {
+              quantity > 0
+                ? dispatch(
+                    addToCart({
+                      id: data._id,
+                      name: data.name,
+                      price: data.price,
+                      image: data.image,
+                      shop: data.shop,
+                      quantity,
+                      foodType: data.foodType,
+                    })
+                  )
+                : null;
+            }}
+            className={`${
+              cartItems.some((i) => i.id === data._id)
+                ? "bg-gray-800"
+                : "bg-[#32CD32]"
+            } text-white px-3 py-2 transition-colors cursor-pointer `}
           >
             <FaShoppingCart size={16} />
           </button>
