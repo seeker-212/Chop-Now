@@ -9,6 +9,7 @@ import {
   setState,
   setUserData,
 } from "../redux/userSlice.js";
+import { setAddress, setLocation } from "../redux/mapSlice.js";
 
 const useGetCity = () => {
   //Use Dispatch
@@ -27,6 +28,8 @@ const useGetCity = () => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
 
+        dispatch(setLocation({lat: latitude, lon: longitude}))
+
         //Fetching data from geoafify docs
         const result = await axios.get(
           `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apikey}`
@@ -40,6 +43,7 @@ const useGetCity = () => {
               result?.data?.results[0].address_line1
           )
         );
+        dispatch(setAddress(result?.data?.results[0].address_line2))
       },
       (error) => {
         console.error("Geolocation error:", error);
