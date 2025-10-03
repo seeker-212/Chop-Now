@@ -7,7 +7,7 @@ const mapSlice = createSlice({
       lat: null,
       lon: null,
     },
-    address: null,
+    address: null || "",
   },
   reducers: {
     setLocation: (state, action) => {

@@ -1,31 +1,83 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { IoLocationSharp, IoSearchOutline } from "react-icons/io5";
 import { TbCurrentLocation } from "react-icons/tb";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "leaflet/dist/leaflet.css";
-import { setLocation } from "../redux/mapSlice";
+import { setAddress, setLocation } from "../redux/mapSlice";
+import axios from "axios";
+import { MdDeliveryDining } from "react-icons/md";
+import { FaCreditCard } from "react-icons/fa";
+import { FaMobileScreenButton } from "react-icons/fa6";
 
-function RecenterMap({location}){
+function RecenterMap({ location }) {
   if (location.lat && location.lon) {
-    const map = useMap()
-    map.setView([location.lat, location.lon], 16, {animate: true})
+    const map = useMap();
+    map.setView([location.lat, location.lon], 16, { animate: true });
   }
-  return null
+  return null;
 }
 
 const CheckOut = () => {
+  //Fetching apikey from env
+  const apikey = import.meta.env.VITE_GEOAPIKEY;
+
   //Destructuring from map slice
   const { location, address } = useSelector((state) => state.map);
 
+  //USESTATE VARIABLE
+  const [addressInput, setAddressInput] = useState("");
+  const [PaymentMethod, setPaymentMethod] = useState("cod");
+
+  //USEDISPATCH
+  const dispatch = useDispatch();
+
   const onDragEnd = (e) => {
-    console.log(e.targer._latlng)
-    const {lat, lng} = e.target._latlng
-    dispatch(setLocation({lat, lon:lng}))
-    const map = useMap()
-    map.setView([lat, lng], 16, {animate: true})
-  }
+    const { lat, lng } = e.target._latlng;
+    dispatch(setLocation({ lat, lon: lng }));
+    getAddressByLatLng(lat, lng);
+  };
+
+  const getCurrentLocation = () => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      dispatch(setLocation({ lat: latitude, lon: longitude }));
+
+      getAddressByLatLng(latitude, longitude);
+    });
+  };
+
+  const getAddressByLatLng = async (lat, lng) => {
+    try {
+      //Fetching data from geoafify docs
+      const result = await axios.get(
+        `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${apikey}`
+      );
+      dispatch(setAddress(result?.data?.results[0].address_line2));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getLatLngByAddress = async () => {
+    try {
+      const result = await axios.get(
+        `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
+          addressInput
+        )}&apiKey=${apikey}`
+      );
+      const { lat, lon } = result.data.features[0].properties;
+      dispatch(setLocation({ lat, lon }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    setAddressInput(address);
+  }, [address]);
 
   return (
     <div className="min-h-screen bg-[#fff9f6] flex items-center justify-center p-6">
@@ -49,17 +101,20 @@ const CheckOut = () => {
               className="flex-1 border border-gray-300 rounded-lg p-2 tex-sm focus:outline-none focus:ring-2
                 focus:ring-[#32CD32] w-full"
               placeholder="Enter Your Delivery Address..."
-              value={address}
+              onChange={(e) => setAddressInput(e.target.value)}
+              value={addressInput}
             />
             <button
               className="bg-[#32CD32] hover:bg-[#32CD32] text-white px-3 py-2 rounded-lg flex
             items-center justify-center cursor-pointer"
+              onClick={getLatLngByAddress}
             >
               <IoSearchOutline size={17} />
             </button>
             <button
               className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center
             justify-center cursor-pointer"
+              onClick={getCurrentLocation}
             >
               <TbCurrentLocation size={17} />
             </button>
@@ -79,9 +134,60 @@ const CheckOut = () => {
                 <RecenterMap location={location} />
                 <Marker
                   position={[location?.lat, location?.lon]}
-                  draggable eventHandlers={{ dragend: onDragEnd }}
+                  draggable
+                  eventHandlers={{ dragend: onDragEnd }}
                 />
               </MapContainer>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold mb-3 text-gray-800">
+            Payment Method
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* CASH ON DELIVERY */}
+            <div
+              className={`flex items-center cursor-pointer gap-3 rounded-xl border p-4 text-left transition
+            ${
+              PaymentMethod === "cod"
+                ? "border-[#32CD32] bg-green-50 shadow"
+                : "border-gray-200 hover:border-gray-300"
+            }`}
+              onClick={() => setPaymentMethod("cod")}
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+                <MdDeliveryDining className="text-xl text-green-600" />
+              </span>
+              <div>
+                <p className="text-gray-800 font-medium">Cash On Delivery</p>
+                <p className="text-gray-500 text-xs">
+                  Pay When Your Food Arrives
+                </p>
+              </div>
+            </div>
+
+            {/* ONLINE PAYMENT */}
+            <div
+              className={`flex items-center cursor-pointer gap-3 rounded-xl border p-4 text-left transition
+            ${
+              PaymentMethod === "online"
+                ? "border-[#32CD32] bg-green-50 shadow"
+                : "border-gray-200 hover:border-gray-300"
+            }`}
+              onClick={() => setPaymentMethod("online")}
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                <FaMobileScreenButton className="text-purple-700 text-lg" />
+              </span>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                <FaCreditCard className="text-blue-700 text-lg" />
+              </span>
+              <div>
+                <p className="font-medium text-gray-800">UPI / Credit / Debit Card</p>
+                <p className="text-xs text-gray-500">Pay Securely Online</p>
+              </div>
             </div>
           </div>
         </section>
