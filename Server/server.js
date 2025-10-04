@@ -8,6 +8,7 @@ import cors from 'cors'
 import userRouter from './routes/userRoutes.js';
 import shopRouter from './routes/shopRoute.js';
 import itemRouter from './routes/itemRoute.js';
+import orderRouter from './routes/orderRoutes.js';
 
 // Making Necessary connections
 connectDB()
@@ -29,6 +30,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/user', userRouter)
 app.use('/api/shop', shopRouter)
 app.use('/api/item', itemRouter)
+app.use('/api/order', orderRouter)
 
 //Check if Api is working
 app.use('/', (req, res) => (res.send('Api is working')))

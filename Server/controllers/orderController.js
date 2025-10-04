@@ -1,5 +1,5 @@
-import Order from "../model/orderModel";
-import Shop from "../model/shopModel";
+import Order from "../model/orderModel.js";
+import Shop from "../model/shopModel.js";
 
 //MAKE AN ORDER CONTROLLER
 export const placeOrder = async (req, res) => {
