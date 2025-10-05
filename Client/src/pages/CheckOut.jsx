@@ -11,6 +11,7 @@ import { MdDeliveryDining } from "react-icons/md";
 import { FaCreditCard } from "react-icons/fa";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import { serverUrl } from "../App";
 
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
@@ -31,7 +32,7 @@ const CheckOut = () => {
 
   //USESTATE VARIABLE
   const [addressInput, setAddressInput] = useState("");
-  const [PaymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
   //USEDISPATCH
   const dispatch = useDispatch();
@@ -80,6 +81,29 @@ const CheckOut = () => {
       );
       const { lat, lon } = result.data.features[0].properties;
       dispatch(setLocation({ lat, lon }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //This will handle customer orders
+  const placeOrderHandler = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/order/place-order`,
+        {
+          paymentMethod,
+          deliveryAddress: {
+            text: addressInput,
+            latitude: location.lat,
+            longitude: location.lon,
+          },
+          totalAmount,
+          cartItems,
+        },
+        { withCredentials: true }
+      );
+      console.log(result.data);
     } catch (error) {
       console.log(error);
     }
@@ -164,7 +188,7 @@ const CheckOut = () => {
             <div
               className={`flex items-center cursor-pointer gap-3 rounded-xl border p-4 text-left transition
             ${
-              PaymentMethod === "cod"
+              paymentMethod === "cod"
                 ? "border-[#32CD32] bg-green-50 shadow"
                 : "border-gray-200 hover:border-gray-300"
             }`}
@@ -185,7 +209,7 @@ const CheckOut = () => {
             <div
               className={`flex items-center cursor-pointer gap-3 rounded-xl border p-4 text-left transition
             ${
-              PaymentMethod === "online"
+              paymentMethod === "online"
                 ? "border-[#32CD32] bg-green-50 shadow"
                 : "border-gray-200 hover:border-gray-300"
             }`}
@@ -240,10 +264,11 @@ const CheckOut = () => {
           </div>
         </section>
         <button
+          onClick={placeOrderHandler}
           className="w-full bg-[#32CD32] hover:bg-[#2ab12a] text-white py-3 rounded-xl font-semibold
         cursor-pointer"
         >
-          {PaymentMethod === "cod" ? "Place Order" : "Pay and Place Order"}
+          {paymentMethod === "cod" ? "Place Order" : "Pay and Place Order"}
         </button>
       </div>
     </div>

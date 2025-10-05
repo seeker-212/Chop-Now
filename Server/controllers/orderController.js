@@ -28,7 +28,7 @@ export const placeOrder = async (req, res) => {
 
     const shopOrders = await Promise.all(
       Object.keys(groupItemByShop).map(async (shopId) => {
-        const shop = await Shop.find(shopId).populate("owner");
+        const shop = await Shop.findById(shopId).populate("owner");
         if (!shop) {
           return res.status(400).json({ message: "Shop not found" });
         }
@@ -53,7 +53,7 @@ export const placeOrder = async (req, res) => {
     );
 
     const newOrder  = await Order.create({
-        user: rq.userId,
+        user: req.userId,
         paymentMethod,
         deliveryAddress,
         totalAmount,
