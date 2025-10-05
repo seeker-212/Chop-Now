@@ -13,6 +13,11 @@ const shopOrderSchema = new mongoose.Schema(
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     subtotal: Number,
     shopOrderItem: [shopOrderItemSchema],
+    status: {
+      type: String,
+      enum: ["pending", "preparing", "out for delivery", "delivered"],
+      default: "pending"
+    },
   },
   { timestamps: true }
 );
@@ -28,6 +33,5 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-const Order = mongoose.model("Order", orderSchema)
-export default Order
+const Order = mongoose.model("Order", orderSchema);
+export default Order;
