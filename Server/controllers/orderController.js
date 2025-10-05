@@ -1,5 +1,6 @@
 import Order from "../model/orderModel.js";
 import Shop from "../model/shopModel.js";
+import User from "../model/userModel.js";
 
 //MAKE AN ORDER CONTROLLER
 export const placeOrder = async (req, res) => {
@@ -52,50 +53,48 @@ export const placeOrder = async (req, res) => {
       })
     );
 
-    const newOrder  = await Order.create({
-        user: req.userId,
-        paymentMethod,
-        deliveryAddress,
-        totalAmount,
-        shopOrders
-    })
+    const newOrder = await Order.create({
+      user: req.userId,
+      paymentMethod,
+      deliveryAddress,
+      totalAmount,
+      shopOrders,
+    });
 
-    return res.status(201).json(newOrder)
+    return res.status(201).json(newOrder);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({message: `Error placing order ${error}`})
+    return res.status(500).json({ message: `Error placing order ${error}` });
   }
 };
 
-
-//GET USER ORDERS
-export const getUserOrders = async (req, res) => {
+//GET USER & OWNER ORDERS
+export const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({user: req.userId})
-    .sort({createdAt: -1})
-    .populate('shopOrders.shop, "name')
-    .populate("shopOrders.owner", "name email mobile")
-    .populate("shopOrders.shopOrderItem.item", "name image price")
+    const user = await User.findById(req.userId);
+    if (user.role === "user") {
+      const orders = await Order.find({ user: req.userId })
+        .sort({ createdAt: -1 })
+        .populate("shopOrders.shop", "name")
+        .populate("shopOrders.owner", "name email mobile")
+        .populate("shopOrders.shopOrderItem.item", "name image price");
 
-    return res.status(200).json(orders)
+      return res.status(200).json(orders);
+    } else if (user.role === "owner") {
+      const orders = await Order.find({ "shopOrders.owner": req.userId })
+        .sort({ createdAt: -1 })
+        .populate("shopOrders.shop", "name")
+        .populate("user")
+        .populate("shopOrders.shopOrderItem.item", "name image price");
+
+      return res.status(200).json(orders);
+    } else {
+      return res.status(403).json({ message: "Unauthorized role" });
+    }
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({message: `Error Getting User order ${error}`})
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: `Error Getting User order ${error}` });
   }
-}
-
-//GET OWNER ORDERS
-export const getOwnerOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({"shopOrders.owner": req.userId})
-    .sort({createdAt: -1})
-    .populate('shopOrders.shop, "name')
-    .populate("user")
-    .populate("shopOrders.shopOrderItem.item", "name image price")
-
-    return res.status(200).json(orders)
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json({message: `Error Getting owner order ${error}`})
-  }
-}
+};
