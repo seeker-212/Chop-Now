@@ -2,8 +2,12 @@ import axios from "axios";
 import React from "react";
 import { MdPhone } from "react-icons/md";
 import { serverUrl } from "../App";
+import { updateOrderStatus } from "../redux/userSlice";
+import { useDispatch } from "react-redux";
 
 const OwnerCartOrder = ({ data }) => {
+  const dispatch = useDispatch();
+
   const handleUpdateStatus = async (orderId, shopId, status) => {
     try {
       const result = await axios.post(
@@ -11,7 +15,7 @@ const OwnerCartOrder = ({ data }) => {
         { status },
         { withCredentials: true }
       );
-      console.log(result.data);
+      dispatch(updateOrderStatus({ orderId, shopId, status }));
     } catch (error) {
       console.log(error);
     }
@@ -81,6 +85,7 @@ const OwnerCartOrder = ({ data }) => {
           className="rounded-md border px-3 py-1 text-sm
         focus:outline-0 focus:ring-2 border-[#32CD32] text-[#32CD32]"
         >
+          <option value="">Change Status</option>
           <option value="pending">Pending</option>
           <option value="preparing">Preparing</option>
           <option value="out for delivery">Out for delivery</option>
