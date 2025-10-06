@@ -1,7 +1,22 @@
+import axios from "axios";
 import React from "react";
 import { MdPhone } from "react-icons/md";
+import { serverUrl } from "../App";
 
 const OwnerCartOrder = ({ data }) => {
+  const handleUpdateStatus = async (orderId, shopId, status) => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/order/update-status/${orderId}/${shopId}`,
+        { status },
+        { withCredentials: true }
+      );
+      console.log(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="bg-white shadow rounded-lg space-y-4 p-4">
       <div>
@@ -56,7 +71,13 @@ const OwnerCartOrder = ({ data }) => {
         </span>
 
         <select
-          value={data.shopOrders[0]?.status}
+          onChange={(e) =>
+            handleUpdateStatus(
+              data._id,
+              data.shopOrders[0]?.shop._id,
+              e.target.value
+            )
+          }
           className="rounded-md border px-3 py-1 text-sm
         focus:outline-0 focus:ring-2 border-[#32CD32] text-[#32CD32]"
         >

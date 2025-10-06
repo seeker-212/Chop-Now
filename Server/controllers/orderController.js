@@ -61,8 +61,11 @@ export const placeOrder = async (req, res) => {
       shopOrders,
     });
 
-    await newOrder.populate("shopOrders.shopOrderItem.item", "name image price")
-    await newOrder.populate("shopOrders.shop", "name")
+    await newOrder.populate(
+      "shopOrders.shopOrderItem.item",
+      "name image price"
+    );
+    await newOrder.populate("shopOrders.shop", "name");
 
     return res.status(201).json(newOrder);
   } catch (error) {
@@ -117,22 +120,28 @@ export const getMyOrders = async (req, res) => {
 //Order Status Controller
 export const updateOrderStatus = async (req, res) => {
   try {
-    const {orderId, shopId} = req.params
-    const {status} = req.body
+    const { orderId, shopId } = req.params;
+    const { status } = req.body;
 
-    const order = await Order.findById(orderId)
-    const shopOrder = order.shopOrders.find(o => o.shop._id === shopId)
-
-    if (!shopOrder) {
-      return res.status(400).json({message: "shop Order not found"})
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
 
-    shopOrder.status = status
-    await shopOrder.save()
-    await shopOrder.populate("shopOrderItem.item", "name image price")
-    return res.status(200).json(shopOrder)
+    const shopOrder = order.shopOrders.find(
+      (o) => o.shop?._id?.toString() === shopId || o.shop?.toString() === shopId
+    );
+
+    if (!shopOrder) {
+      return res.status(400).json({ message: "shop Order not found" });
+    }
+
+    shopOrder.status = status;
+    await order.save();
+
+    return res.status(200).json({ status: shopOrder.status });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ message: `Order Status error ${error}` });
   }
-}
+};
