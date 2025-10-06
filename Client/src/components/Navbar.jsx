@@ -140,6 +140,7 @@ const Navbar = () => {
 
             {/* For larger Screen */}
             <div
+              onClick={() => navigate("/my-orders")}
               className="hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg
             bg-[#32CD32]/10 text-[#32CD32] font-medium"
             >
@@ -155,6 +156,7 @@ const Navbar = () => {
 
             {/* For smaller screen */}
             <div
+              onClick={() => navigate("/my-orders")}
               className="md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg
             bg-[#32CD32]/10 text-[#32CD32] font-medium"
             >
@@ -183,6 +185,7 @@ const Navbar = () => {
 
             {/* This my ORDERS section works for medium screen and above */}
             <button
+              onClick={() => navigate("/my-orders")}
               className="hidden md:block px-3 py-1 rounded-lg bg-[#32CD32]/10 text-[#32CD32]
       cursor-pointer text-sm font-medium"
             >
@@ -207,7 +210,10 @@ const Navbar = () => {
             <div className="text-[17px] font-semibold">{userData.fullName}</div>
             {/* This my ORDERS section works for small screen only */}
             {userData.role === "user" && (
-              <div className="md:hidden text-[#32CD32] font-semibold cursor-pointer">
+              <div
+                onClick={() => navigate("/my-orders")}
+                className="md:hidden text-[#32CD32] font-semibold cursor-pointer"
+              >
                 My Orders
               </div>
             )}

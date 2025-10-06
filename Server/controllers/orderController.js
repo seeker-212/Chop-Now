@@ -87,14 +87,17 @@ export const getMyOrders = async (req, res) => {
         .populate("user")
         .populate("shopOrders.shopOrderItem.item", "name image price");
 
-        const filteredOrders = orders.map((order) => ({
-          _id: order._id,
-          paymentMethod: order.paymentMethod,
-          user: order.user,
-          shopOrders: order.shopOrders.find(o => o.owner._id === req.userId),
-          createdAt: order.createdAt,
-          deliveryAddress: order.deliveryAddress
-        }))
+      const filteredOrders = orders.map((order) => ({
+        _id: order._id,
+        paymentMethod: order.paymentMethod,
+        user: order.user,
+        shopOrders:
+          order.shopOrders?.filter(
+            (o) => o.owner?._id?.toString() === req.userId.toString()
+          ) || [],
+        createdAt: order.createdAt,
+        deliveryAddress: order.deliveryAddress,
+      }));
 
       return res.status(200).json(filteredOrders);
     } else {
