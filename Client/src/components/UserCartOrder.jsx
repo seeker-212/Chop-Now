@@ -34,7 +34,7 @@ const UserCartOrder = ({ data }) => {
           className="border border-gray-200 rounded bg-[#fffaf7] space-y-3"
           key={index}
         >
-          <p>{shopOrder.shop.name}</p>
+          <p className="text-xl font-bold">{shopOrder.shop.name}</p>
 
           <div className="flex space-x-4 overflow-x-auto pb-2">
             {shopOrder.shopOrderItem.map((item, index) => (
