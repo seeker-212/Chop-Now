@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const shopOrderItemSchema = new mongoose.Schema({
   item: { type: mongoose.Schema.Types.ObjectId, ref: "Item", required: true },
@@ -18,6 +18,11 @@ const shopOrderSchema = new mongoose.Schema(
       enum: ["pending", "preparing", "out for delivery", "delivered"],
       default: "pending"
     },
+    assignment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryAssignment",
+      default: null
+    }
   },
   { timestamps: true }
 );
