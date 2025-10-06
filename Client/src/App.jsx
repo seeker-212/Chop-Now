@@ -18,6 +18,7 @@ import CheckOut from "./pages/CheckOut";
 import OrderPlaced from "./pages/OrderPlaced";
 import MyOrder from "./pages/MyOrder";
 import useGetMyOrders from "./hooks/useGetMyOrders";
+import useUpdateLocation from "./hooks/useUpdateLocation";
 
 //Exporting Server URL so other pages can use it
 export const serverUrl = "http://localhost:5000";
@@ -29,6 +30,8 @@ const App = () => {
   useGetShopByCity();
   useGetItemByCity();
   useGetMyOrders();
+  useUpdateLocation();
+
   const { userData, loading } = useSelector((state) => state.user);
   const { ownerLoading } = useSelector((state) => state.owner);
   const isLoading = loading || ownerLoading;
