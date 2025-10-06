@@ -42,9 +42,15 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Shop",
     },
+    location: {
+      type:{type: String, enum: ['point'], default: 'point'},
+      coordinates: {type: [Number], default: [0,0]}
+    }
   },
   { timestamps: true }
 );
+
+userSchema.index({location: '2dsphere'})
 
 const User = mongoose.model("User", userSchema);
 
