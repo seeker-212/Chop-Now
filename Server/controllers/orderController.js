@@ -87,7 +87,15 @@ export const getMyOrders = async (req, res) => {
         .populate("user")
         .populate("shopOrders.shopOrderItem.item", "name image price");
 
-      return res.status(200).json(orders);
+        const filteredOrders = orders.map((order) => ({
+          _id: order._id,
+          paymentMethod: order.paymentMethod,
+          user: order.user,
+          shopOrders: order.shopOrders.find(o => o.owner._id === req.userId),
+          createdAt: order.createdAt 
+        }))
+
+      return res.status(200).json(filteredOrders);
     } else {
       return res.status(403).json({ message: "Unauthorized role" });
     }
