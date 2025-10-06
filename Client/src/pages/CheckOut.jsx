@@ -12,6 +12,7 @@ import { FaCreditCard } from "react-icons/fa";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App";
+import { addMyOrder } from "../redux/userSlice";
 
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
@@ -103,7 +104,7 @@ const CheckOut = () => {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
+      dispatch(addMyOrder(result.data))
       navigate("/order-placed")
     } catch (error) {
       console.log(error);
