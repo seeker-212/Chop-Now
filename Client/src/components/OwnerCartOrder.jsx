@@ -118,7 +118,7 @@ const OwnerCartOrder = ({ data }) => {
           {data.shopOrders[0]?.availableBoys?.length > 0 ? (
             data.shopOrders[0]?.availableBoys.map((b, index) => (
               <div className="text-green-500" key={index}>
-                {b.fullName} - {b.mobile} <p>Lat: {b.latitude}, Lon: {b.longitude}</p>
+                Rider Name: {b.fullName} - Mobile: {b.mobile}
               </div>
             ))
           ) : (

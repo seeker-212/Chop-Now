@@ -201,7 +201,7 @@ const SignUp = () => {
             Role
           </label>
           <div className="flex gap-2">
-            {["user", "owner", "ChopNowRider"].map((r) => (
+            {["user", "owner", "chopNowRider"].map((r) => (
               <button
                 key={r}
                 className="flex-1 border border-gray-400 rounded-lg px-2 py-2 text-center font-medium
