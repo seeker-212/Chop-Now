@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import DeliveryAssignment from "../model/deliveryAssignmentModel.js";
 import Order from "../model/orderModel.js";
 import Shop from "../model/shopModel.js";
@@ -219,27 +220,34 @@ export const updateOrderStatus = async (req, res) => {
 //Delivery Assignment Controller
 export const getDeliveryAssignment = async (req, res) => {
   try {
-    const deliveryBoyId = req.userId
+    const deliveryBoyId = new mongoose.Types.ObjectId(req.userId);
     const assignment = await DeliveryAssignment.find({
       broadcastedTo: deliveryBoyId,
-      status: "broadcasted"
+      status: "broadcasted",
     })
-    .populate("order")
-    .populate("shop")
+      .populate("order")
+      .populate("shop");
 
-    const formatted = assignment.map(a => ({
-      assignment: a._id,
-      orderId: a.order._id,
-      shopName: a.shop.name,
-      deliveryAddress: a.order.deliveryAddress,
-      items: a.order.shopOrders.find(s => s._id.equals(a.shopOrderId)).shopOrderItem || [],
-      subtotal: a.order.shopOrders.find(s => s._id.equals(a.shopOrderId))?.subtotal
-      
-    }))
+    const formatted = assignment.map((a) => {
+      const shopOrder = a.order.shopOrders.find((s) =>
+        s._id.equals(a.shopOrderId)
+      );
+      return {
+        assignment: a._id,
+        orderId: a.order._id,
+        shopName: a.shop.name,
+        deliveryAddress: a.order.deliveryAddress,
+        items: shopOrder?.shopOrderItem || [],
+        subtotal: shopOrder?.subtotal || 0,
+      };
+    });
 
-    return res.status(200).json(formatted)
+
+    return res.status(200).json(formatted);
   } catch (error) {
-    console.error(error)
-    return res.status(500).json({message: `Assigning Delivery Error ${error}`})
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: `Assigning Delivery Error ${error}` });
   }
-}
+};
