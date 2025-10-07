@@ -69,20 +69,58 @@ const userSlice = createSlice({
       );
     },
     setMyOrders: (state, action) => {
-      state.myOrders = action.payload;
+      const newOrders = action.payload;
+
+      // merge instead of replacing
+      state.myOrders = newOrders.map((newOrder) => {
+        const existingOrder = state.myOrders.find(
+          (o) => o._id === newOrder._id
+        );
+
+        if (!existingOrder) return newOrder;
+
+        // Merge shopOrders to preserve availableBoys, assignment, etc.
+        const mergedShopOrders = newOrder.shopOrders.map((shopOrder, index) => {
+          const existingShopOrder = existingOrder.shopOrders[index];
+          if (!existingShopOrder) return shopOrder;
+
+          return {
+            ...shopOrder,
+            availableBoys:
+              existingShopOrder.availableBoys || shopOrder.availableBoys,
+            assignment: existingShopOrder.assignment || shopOrder.assignment,
+          };
+        });
+
+        return {
+          ...newOrder,
+          shopOrders: mergedShopOrders,
+        };
+      });
     },
+
     addMyOrder: (state, action) => {
       state.myOrders = [action.payload, ...state.myOrders];
     },
     updateOrderStatus: (state, action) => {
-      const { orderId, shopId, status } = action.payload;
+      const { orderId, shopId, status, availableBoys, assignment } =
+        action.payload;
       const order = state.myOrders.find((o) => o._id === orderId);
+      console.log(
+        "Updated Redux myOrders:",
+        JSON.parse(JSON.stringify(state.myOrders))
+      );
+
       if (order) {
         const shopOrder = order.shopOrders.find(
-          (s) => s.shop?._id === shopId || s.shop === shopId
+          (so) => so.shop._id === shopId || so.shop === shopId
         );
         if (shopOrder) {
           shopOrder.status = status;
+
+          // attach new data if available
+          if (availableBoys) shopOrder.availableBoys = availableBoys;
+          if (assignment) shopOrder.assignment = assignment;
         }
       }
     },

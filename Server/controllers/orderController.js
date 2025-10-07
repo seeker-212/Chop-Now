@@ -120,6 +120,7 @@ export const getMyOrders = async (req, res) => {
 
 //Order Status Controller
 export const updateOrderStatus = async (req, res) => {
+  console.log("🔥 updateOrderStatus hit");
   try {
     const { orderId, shopId } = req.params;
     const { status } = req.body;
@@ -149,7 +150,7 @@ export const updateOrderStatus = async (req, res) => {
               type: "Point",
               coordinates: [Number(longitude), Number(latitude)],
             },
-            $maxDistance: 5000,
+            $maxDistance: 50000,
           },
         },
       });
@@ -185,8 +186,8 @@ export const updateOrderStatus = async (req, res) => {
       deliveryBoyPayLoad = availableBoys.map((b) => ({
         id: b._id,
         fullName: b.fullName,
-        longitude: b.longitude.coordinates?.[0],
-        latitude: b.latitude.coordinates?.[1],
+        longitude: b.location.coordinates?.[0],
+        latitude: b.location.coordinates?.[1],
         mobile: b.mobile,
       }));
     }
@@ -194,21 +195,20 @@ export const updateOrderStatus = async (req, res) => {
     await shopOrder.save();
     await order.save();
 
+    const updatedShopOrder = order.shopOrders.find(
+      (o) => o.shop?._id?.toString() === shopId || o.shop?.toString() === shopId
+    );
+
     await order.populate("shopOrders.shop", "name");
     await order.populate(
       "shopOrders.assignedDeliveryBoy",
       "fullName email mobile"
     );
-
-    const updatedShopOrder = order.shopOrders.find(
-      (o) => o.shop?._id?.toString() === shopId || o.shop?.toString() === shopId
-    );
-
     return res.status(200).json({
       shopOrder: updatedShopOrder,
-      assignedDeliveryBoy: updatedShopOrder.assignedDeliveryBoy,
+      assignedDeliveryBoy: updatedShopOrder?.assignedDeliveryBoy,
       availableBoys: deliveryBoyPayLoad,
-      assignment: updatedShopOrder.assignment._id,
+      assignment: updatedShopOrder?.assignment._id,
     });
   } catch (error) {
     console.log(error);

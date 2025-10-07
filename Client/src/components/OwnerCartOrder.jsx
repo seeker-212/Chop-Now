@@ -4,9 +4,13 @@ import { MdPhone } from "react-icons/md";
 import { serverUrl } from "../App";
 import { updateOrderStatus } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 
 const OwnerCartOrder = ({ data }) => {
   const dispatch = useDispatch();
+
+  //USESTATE VARIABLES
+  const [availableBoys, setAvailableBoys] = useState([]);
 
   const handleUpdateStatus = async (orderId, shopId, status) => {
     try {
@@ -15,7 +19,19 @@ const OwnerCartOrder = ({ data }) => {
         { status },
         { withCredentials: true }
       );
-      dispatch(updateOrderStatus({ orderId, shopId, status }));
+      dispatch(
+        updateOrderStatus({
+          orderId,
+          shopId,
+          status,
+          availableBoys: result.data.availableBoys,
+          assignment: result.data.assignment,
+        })
+      );
+      setAvailableBoys(result.data.availableBoys || []);
+      console.log("Boys:", result.data.availableBoys);
+
+      console.log('Main data:',result.data);
     } catch (error) {
       console.log(error);
     }
@@ -75,13 +91,15 @@ const OwnerCartOrder = ({ data }) => {
         </span>
 
         <select
-          onChange={(e) =>
+          value={data.shopOrders[0]?.status || ""}
+          onChange={(e) => {
+            console.log("Select changed:", e.target.value);
             handleUpdateStatus(
               data._id,
               data.shopOrders[0]?.shop._id,
               e.target.value
-            )
-          }
+            );
+          }}
           className="rounded-md border px-3 py-1 text-sm
         focus:outline-0 focus:ring-2 border-[#32CD32] text-[#32CD32]"
         >
@@ -92,6 +110,23 @@ const OwnerCartOrder = ({ data }) => {
           <option value="delivered">Delivered</option>
         </select>
       </div>
+      {console.log("DATA: ",data)}
+      {data.shopOrders[0]?.status === "out for delivery" && (
+        <div className="mt-3 p-2 border border-gray-300 rounded-lg text-sm bg-green-50">
+          <p className="text-lg font-bold">Available ChopNow Rider</p>
+
+          {data.shopOrders[0]?.availableBoys?.length > 0 ? (
+            data.shopOrders[0]?.availableBoys.map((b, index) => (
+              <div className="text-green-500" key={index}>
+                {b.fullName} - {b.mobile} <p>Lat: {b.latitude}, Lon: {b.longitude}</p>
+              </div>
+            ))
+          ) : (
+            <div className="mt-2 text-sm text-red-500">No Available ChopNow Rider</div>
+          )}
+        </div>
+      )}
+
       <div className="text-right font-bold text-gray-800 text-sm">
         Total: ₦{data.shopOrders[0]?.subtotal}
       </div>

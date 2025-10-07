@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     paymentMethod: { type: String, enum: ["cod", "online"], required: true },
-    deliveryAddress: { text: String, latitude: Number, longitude: Number },
+    deliveryAddress: { text: String, longitude: Number, latitude: Number},
     totalAmount: { type: Number },
     shopOrders: [shopOrderSchema],
   },
