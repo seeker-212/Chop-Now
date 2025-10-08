@@ -233,7 +233,7 @@ export const getDeliveryAssignment = async (req, res) => {
         s._id.equals(a.shopOrderId)
       );
       return {
-        assignment: a._id,
+        assignmentId: a._id,
         orderId: a.order._id,
         shopName: a.shop.name,
         deliveryAddress: a.order.deliveryAddress,
@@ -242,12 +242,55 @@ export const getDeliveryAssignment = async (req, res) => {
       };
     });
 
-
     return res.status(200).json(formatted);
   } catch (error) {
     console.error(error);
     return res
       .status(500)
       .json({ message: `Assigning Delivery Error ${error}` });
+  }
+};
+
+//Delivery Guy Accept order controller
+export const acceptOrder = async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+    const assignment = await DeliveryAssignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(400).json({ message: "assignment not found" });
+    }
+    if (!assignment.status !== "broadcasted") {
+      return res.status(400).json({ message: "assignment has expired" });
+    }
+    const alreadyAssigned = await DeliveryAssignment.findOne({
+      assignedTo: req.userId,
+      status: { $nin: ["broadcasted", "completed"] },
+    });
+    if (alreadyAssigned) {
+      return res
+        .status(400)
+        .json({ message: "You are already assigned to another order" });
+    }
+
+    assignment.assignedTo = req.userId;
+    assignment.status = "assigned";
+    assignment.acceptedAt = new Date();
+    await assignment.save();
+
+    const order = await Order.findById(assignment.order);
+    if (!order) {
+      return res.status(400).json({ message: "order not found" });
+    }
+
+    const shopOrder = order.shopOrders.find(
+      (s) => s._id === assignment.shopOrderId
+    );
+    shopOrder.assignedDeliveryBoy = req.userId;
+    await order.save();
+
+    return res.status(200).json({ message: "Order Accepted" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: `Accepting Order Error ${error}` });
   }
 };
