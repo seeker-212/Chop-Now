@@ -16,17 +16,27 @@ const shopOrderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "preparing", "out for delivery", "delivered"],
-      default: "pending"
+      default: "pending",
     },
     assignment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "DeliveryAssignment",
-      default: null
+      default: null,
     },
     assignedDeliveryBoy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    }
+    },
+    resetOtp: {
+      type: String,
+    },
+    isOtpVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otpExpires: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
@@ -35,7 +45,7 @@ const orderSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     paymentMethod: { type: String, enum: ["cod", "online"], required: true },
-    deliveryAddress: { text: String, longitude: Number, latitude: Number},
+    deliveryAddress: { text: String, longitude: Number, latitude: Number },
     totalAmount: { type: Number },
     shopOrders: [shopOrderSchema],
   },
