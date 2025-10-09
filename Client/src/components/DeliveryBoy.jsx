@@ -23,6 +23,19 @@ const DeliveryBoy = () => {
     }
   };
 
+  const acceptOrder = async (assignmentId) => {
+    try {
+      const result = await axios.get(
+        `${serverUrl}/api/order/accept-order/${assignmentId}`,
+        { withCredentials: true }
+      );
+      setAvailableAssignment(result.data);
+      console.log(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   //useEffect
   useEffect(() => {
     getAssignment();
@@ -74,8 +87,13 @@ const DeliveryBoy = () => {
                       {a.items.length} items | ₦{a.subtotal}
                     </p>
                   </div>
-                  <button className="bg-[#32CD32] text-white px-4 py-1 rounded-lg text-sm
-                  hover:bg-[#2bb62b] cursor-pointer">Accept</button>
+                  <button
+                    onClick={() => acceptOrder(a.assignmentId)}
+                    className="bg-[#32CD32] text-white px-4 py-1 rounded-lg text-sm
+                  hover:bg-[#2bb62b] cursor-pointer"
+                  >
+                    Accept
+                  </button>
                 </div>
               ))
             ) : (

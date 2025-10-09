@@ -29,9 +29,6 @@ const OwnerCartOrder = ({ data }) => {
         })
       );
       setAvailableBoys(result.data.availableBoys || []);
-      console.log("Boys:", result.data.availableBoys);
-
-      console.log('Main data:',result.data);
     } catch (error) {
       console.log(error);
     }
@@ -110,19 +107,29 @@ const OwnerCartOrder = ({ data }) => {
           <option value="delivered">Delivered</option>
         </select>
       </div>
-      {console.log("DATA: ",data)}
+      {console.log("DATA: ", data)}
       {data.shopOrders[0]?.status === "out for delivery" && (
         <div className="mt-3 p-2 border border-gray-300 rounded-lg text-sm bg-green-50">
-          <p className="text-lg font-bold">Available ChopNow Rider</p>
-
+          {data.shopOrders[0]?.assignedDeliveryBoy ? (
+            <p className="text-lg font-bold">Assigned ChopNow Rider</p>
+          ) : (
+            <p className="text-lg font-bold">Available ChopNow Rider</p>
+          )}
           {data.shopOrders[0]?.availableBoys?.length > 0 ? (
             data.shopOrders[0]?.availableBoys.map((b, index) => (
               <div className="text-green-500" key={index}>
                 Rider Name: {b.fullName} - Mobile: {b.mobile}
               </div>
             ))
+          ) : data.shopOrders[0]?.assignedDeliveryBoy ? (
+            <div className="text-yellow-500">
+              Assigned Rider: {data.shopOrders[0]?.assignedDeliveryBoy.fullName}{" "}
+              - Mobile: {data.shopOrders[0]?.assignedDeliveryBoy.mobile}
+            </div>
           ) : (
-            <div className="mt-2 text-sm text-red-500">No Available ChopNow Rider</div>
+            <div className="mt-2 text-sm text-red-500">
+              No Available ChopNow Rider
+            </div>
           )}
         </div>
       )}

@@ -93,7 +93,8 @@ export const getMyOrders = async (req, res) => {
         .sort({ createdAt: -1 })
         .populate("shopOrders.shop", "name")
         .populate("user")
-        .populate("shopOrders.shopOrderItem.item", "name image price");
+        .populate("shopOrders.shopOrderItem.item", "name image price")
+        .populate("shopOrders.assignedDeliveryBoy", "fullName mobile");
 
       const filteredOrders = orders.map((order) => ({
         _id: order._id,
@@ -259,7 +260,7 @@ export const acceptOrder = async (req, res) => {
     if (!assignment) {
       return res.status(400).json({ message: "assignment not found" });
     }
-    if (!assignment.status !== "broadcasted") {
+    if (assignment.status !== "broadcasted") {
       return res.status(400).json({ message: "assignment has expired" });
     }
     const alreadyAssigned = await DeliveryAssignment.findOne({
@@ -282,9 +283,7 @@ export const acceptOrder = async (req, res) => {
       return res.status(400).json({ message: "order not found" });
     }
 
-    const shopOrder = order.shopOrders.find(
-      (s) => s._id === assignment.shopOrderId
-    );
+    let shopOrder = order.shopOrders.id(assignment.shopOrderId);
     shopOrder.assignedDeliveryBoy = req.userId;
     await order.save();
 
