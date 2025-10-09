@@ -350,3 +350,35 @@ export const getCurrentOrder = async (req, res) => {
       .json({ message: `Delivery Currrent Order Error ${error}` });
   }
 };
+
+
+//Delivery Guy Get Order By Id Controller
+export const  getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(orderId)
+    .populate("user")
+    .populate({
+      path: "shopOrders.shop",
+      model: "Shop"
+    })
+    .populate({
+      path: "shopOrders.assignedDeliveryBoy",
+      model: "User"
+    })
+    .populate({
+      path: "shopOrders.shopOrderItem.item",
+      model: "Item"
+    })
+    .lean()
+
+    if (!order) {
+      return res.status(400).json({message: "Order not found"})
+    }
+
+    return res.status(200).json(order)
+    
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({message: `Get Order By Id Error ${error}`})
+  }
+}
