@@ -5,6 +5,7 @@ import {
   getCurrentOrder,
   getDeliveryAssignment,
   getMyOrders,
+  getOrderById,
   placeOrder,
   updateOrderStatus,
 } from "../controllers/orderController.js";
@@ -17,5 +18,6 @@ orderRouter.get("/get-assignment", isAuth, getDeliveryAssignment);
 orderRouter.get("/get-current-order", isAuth, getCurrentOrder);
 orderRouter.post("/update-status/:orderId/:shopId", isAuth, updateOrderStatus);
 orderRouter.get("/accept-order/:assignmentId", isAuth, acceptOrder);
+orderRouter.get("/get-order-by-id/:orderId", isAuth, getOrderById);
 
 export default orderRouter;
