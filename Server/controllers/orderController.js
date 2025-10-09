@@ -355,6 +355,7 @@ export const getCurrentOrder = async (req, res) => {
 //Delivery Guy Get Order By Id Controller
 export const  getOrderById = async (req, res) => {
   try {
+    const {orderId} = req.params
     const order = await Order.findById(orderId)
     .populate("user")
     .populate({

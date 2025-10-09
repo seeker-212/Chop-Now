@@ -39,10 +39,10 @@ const Routing = ({ from, to }) => {
       waypoints: [Leaf.latLng(from.lat, from.lon), Leaf.latLng(to.lat, to.lon)],
       lineOptions: { styles: [{ color: "#32CD32", weight: 5 }] },
       addWaypoints: false,
-      createMarker: () => null, // we don't want LRM markers
+      createMarker: () => null, 
       draggableWaypoints: false,
       routeWhileDragging: false,
-      show: false, // may or may not be honored depending on version; we remove control anyway
+      show: false, 
     }).addTo(map);
 
     const onRoutes = (e) => {
