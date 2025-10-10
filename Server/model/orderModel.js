@@ -27,15 +27,13 @@ const shopOrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    resetOtp: {
+    deliveryOtp: {
       type: String,
-    },
-    isOtpVerified: {
-      type: Boolean,
-      default: false,
+      default: null
     },
     otpExpires: {
       type: Date,
+      default: null
     },
   },
   { timestamps: true }

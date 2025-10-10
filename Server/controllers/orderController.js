@@ -3,6 +3,7 @@ import DeliveryAssignment from "../model/deliveryAssignmentModel.js";
 import Order from "../model/orderModel.js";
 import Shop from "../model/shopModel.js";
 import User from "../model/userModel.js";
+import { sendDeliveryOtpMail } from "../utils/mail.js";
 
 //MAKE AN ORDER CONTROLLER
 export const placeOrder = async (req, res) => {
@@ -341,8 +342,8 @@ export const getCurrentOrder = async (req, res) => {
       shopOrder,
       deliveryAddress: assignment.order.deliveryAddress,
       deliveryBoyLocation,
-      customerLocation
-    })
+      customerLocation,
+    });
   } catch (error) {
     console.log(error);
     return res
@@ -351,35 +352,60 @@ export const getCurrentOrder = async (req, res) => {
   }
 };
 
-
 //Delivery Guy Get Order By Id Controller
-export const  getOrderById = async (req, res) => {
+export const getOrderById = async (req, res) => {
   try {
-    const {orderId} = req.params
+    const { orderId } = req.params;
     const order = await Order.findById(orderId)
-    .populate("user")
-    .populate({
-      path: "shopOrders.shop",
-      model: "Shop"
-    })
-    .populate({
-      path: "shopOrders.assignedDeliveryBoy",
-      model: "User"
-    })
-    .populate({
-      path: "shopOrders.shopOrderItem.item",
-      model: "Item"
-    })
-    .lean()
+      .populate("user")
+      .populate({
+        path: "shopOrders.shop",
+        model: "Shop",
+      })
+      .populate({
+        path: "shopOrders.assignedDeliveryBoy",
+        model: "User",
+      })
+      .populate({
+        path: "shopOrders.shopOrderItem.item",
+        model: "Item",
+      })
+      .lean();
 
     if (!order) {
-      return res.status(400).json({message: "Order not found"})
+      return res.status(400).json({ message: "Order not found" });
     }
 
-    return res.status(200).json(order)
-    
+    return res.status(200).json(order);
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({message: `Get Order By Id Error ${error}`})
+    console.log(error);
+    return res.status(500).json({ message: `Get Order By Id Error ${error}` });
   }
-}
+};
+
+export const sendDeliveryOtp = async (req, res) => {
+  try {
+    const { orderId, shopOrderId } = req.body;
+    const order = await Order.findById(orderId).populate("user");
+    const shopOrder = order.shopOrders.id(shopOrderId);
+
+    if (!order || !shopOrder) {
+      return res
+        .status(400)
+        .json({ message: "Enter a valid order/shopOrderId" });
+    }
+
+    const otp = Math.floor(1000 + Math.random() + 9000).toString();
+    shopOrder.deliveryOtp = otp;
+    shopOrder.otpExpires = Date.now() + 5 * 60 * 1000;
+    await order.save();
+
+    await sendDeliveryOtpMail(order.user, otp);
+    return res
+      .status(200)
+      .json({ message: `Otp sent Successfully to ${order?.user?.fullName}` });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: `Error Getting Otp ${error}` });
+  }
+};
