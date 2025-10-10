@@ -14,6 +14,7 @@ const DeliveryBoy = () => {
   const [currentOrder, setCurrentOrder] = useState();
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [availableAssignment, setAvailableAssignment] = useState(null);
+  const [otp, setOtp] = useState("");
 
   const getAssignment = async () => {
     try {
@@ -53,8 +54,35 @@ const DeliveryBoy = () => {
     }
   };
 
-  const handleSendOtp = (e) => {
-    setShowOtpBox(true);
+  const sendOtp = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/order/send-delivery-otp`,
+        { orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id },
+        { withCredentials: true }
+      );
+      console.log(result.data);
+      setShowOtpBox(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const verifyOtp = async () => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/order/verify-delivery-otp`,
+        {
+          orderId: currentOrder._id,
+          shopOrderId: currentOrder.shopOrder._id,
+          otp,
+        },
+        { withCredentials: true }
+      );
+      console.log(result.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   //useEffect
@@ -143,7 +171,7 @@ const DeliveryBoy = () => {
             <DeliveryBoyTracking data={currentOrder} />
             {!showOtpBox ? (
               <button
-                onClick={handleSendOtp}
+                onClick={sendOtp}
                 className="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4
             rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200 cursor-pointer"
               >
@@ -158,12 +186,15 @@ const DeliveryBoy = () => {
                   </span>
                 </p>
                 <input
+                  onChange={(e) => setOtp(e.target.value)}
+                  value={otp}
                   type="text"
                   className="w-full border border-gray-400 px-3 py-2 rounded-lg mb-3
                 outline-none focus:ring-2 focus:ring-green-400"
-                placeholder="Enter OTP"
+                  placeholder="Enter OTP"
                 />
                 <button
+                  onClick={verifyOtp}
                   className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold
                 hover:bg-green-600 transition-all"
                 >

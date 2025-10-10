@@ -395,7 +395,7 @@ export const sendDeliveryOtp = async (req, res) => {
         .json({ message: "Enter a valid order/shopOrderId" });
     }
 
-    const otp = Math.floor(1000 + Math.random() + 9000).toString();
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
     shopOrder.deliveryOtp = otp;
     shopOrder.otpExpires = Date.now() + 5 * 60 * 1000;
     await order.save();
