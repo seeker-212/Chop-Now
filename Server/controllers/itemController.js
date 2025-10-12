@@ -144,28 +144,63 @@ export const getItemByCity = async (req, res) => {
 
     const shopIds = shops.map((shop) => shop._id);
 
-    const items = await Item.find({ shop: { $in: shopIds }});
-    return res.status(200).json(items)
+    const items = await Item.find({ shop: { $in: shopIds } });
+    return res.status(200).json(items);
   } catch (error) {
-    return res.status(500).json({ message: `Error Getting by city Item ${error}` });
+    return res
+      .status(500)
+      .json({ message: `Error Getting by city Item ${error}` });
   }
 };
 
-
 export const getItemByShops = async (req, res) => {
   try {
-    const {shopId} = req.params
-    const shop = await Shop.findById(shopId).populate('items')
+    const { shopId } = req.params;
+    const shop = await Shop.findById(shopId).populate("items");
 
     if (!shop) {
       return res.status(400).json({ message: "shops not found" });
     }
-    
+
     return res.status(200).json({
       shop,
-      items: shop.items
-    })
+      items: shop.items,
+    });
   } catch (error) {
-    return res.status(500).json({ message: `Error Getting item by shops ${error}` });
+    return res
+      .status(500)
+      .json({ message: `Error Getting item by shops ${error}` });
   }
-}
+};
+
+export const searchItems = async (req, res) => {
+  try {
+    const { query, city } = req.query;
+    if (!query || !city) {
+      return null;
+    }
+
+    const shops = await Shop.find({
+      city: { $regex: new RegExp(`^${city}$`, "i") },
+    }).populate("items");
+    //If the shop is not available throw new error
+    if (!shops) {
+      return res.status(400).json({ message: "shops not found" });
+    }
+
+    const shopIds = shops.map((s) => s._id);
+    const items = await Item.find({
+      shop: { $in: shopIds },
+      $or: [
+        { name: { $regex: query, options: "i" } },
+        { category: { $regex: query, options: "i" } },
+      ],
+    }).populate("shop", "name", "image");
+    return res.status(200).json(items);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: `Error searching for items ${error}` });
+  }
+};
