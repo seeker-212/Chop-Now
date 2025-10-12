@@ -8,6 +8,7 @@ import {
   getItemByCity,
   getItemById,
   getItemByShops,
+  searchItems,
 } from "../controllers/itemController.js";
 
 const itemRouter = express.Router();
@@ -18,5 +19,6 @@ itemRouter.get("/get-by-id/:itemId", isAuth, getItemById);
 itemRouter.get("/delete/:itemId", isAuth, deleteItem);
 itemRouter.get("/get-by-city/:city", isAuth, getItemByCity);
 itemRouter.get("/get-by-shop/:shopId", isAuth, getItemByShops);
+itemRouter.get("/search-items", isAuth, searchItems);
 
 export default itemRouter;
