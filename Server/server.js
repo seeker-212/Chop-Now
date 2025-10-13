@@ -11,6 +11,7 @@ import itemRouter from './routes/itemRoute.js';
 import orderRouter from './routes/orderRoutes.js';
 import http from 'http'
 import { Server } from 'socket.io';
+import { sockHandler } from './socket.js';
 
 // Making Necessary connections
 connectDB()
@@ -46,6 +47,9 @@ app.use('/api/user', userRouter)
 app.use('/api/shop', shopRouter)
 app.use('/api/item', itemRouter)
 app.use('/api/order', orderRouter)
+
+//Calling the socket Handler
+sockHandler(io)
 
 //Check if Api is working
 app.use('/', (req, res) => (res.send('Api is working')))

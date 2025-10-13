@@ -1,5 +1,5 @@
 export const sockHandler = async (io) => {
-    io('connection', (socket) => {
+    io.on('connection', (socket) => {
         console.log(socket.id)
     })
 }
