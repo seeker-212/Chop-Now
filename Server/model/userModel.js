@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const userSchema = new mongoose.Schema(
   {
@@ -37,6 +38,9 @@ const userSchema = new mongoose.Schema(
     },
     otpExpires: {
       type: Date,
+    },
+    socketId: {
+      type: String
     },
     shop: {
       type: mongoose.Schema.Types.ObjectId,
