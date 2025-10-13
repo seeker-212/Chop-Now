@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 import { FiShoppingCart } from "react-icons/fi";
@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RxCross2 } from "react-icons/rx";
 import axios from "axios";
 import { serverUrl } from "../App";
-import { setUserData } from "../redux/userSlice";
+import { setSearchItems, setUserData } from "../redux/userSlice";
 import { FaPlus } from "react-icons/fa";
 import { TbReceipt2 } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ const Navbar = () => {
   //Use State variable
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [query, setQuery] = useState("");
 
   //Dispatch
   const dispatch = useDispatch();
@@ -38,6 +39,27 @@ const Navbar = () => {
     }
   };
 
+  //Search Function
+  const handleSearchItems = async () => {
+    try {
+      const result = await axios.get(
+        `${serverUrl}/api/item/search-items?query=${query}&city=${city}`,
+        { withCredentials: true }
+      );
+      dispatch(setSearchItems(result.data))
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //USEEFFECT
+  useEffect(() => {
+    if (query) {
+      handleSearchItems();
+    }else {
+      dispatch(setSearchItems(null))
+    }
+  }, [query]);
   return (
     <div
       className="w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px]
@@ -62,6 +84,8 @@ const Navbar = () => {
               type="text"
               placeholder="Pick your cravings.."
               className="text-gray-700 px-[10px] outline-0 w-full"
+              onChange={(e) => setQuery(e.target.value)}
+              value={query}
             />
           </div>
         </div>
@@ -91,6 +115,8 @@ const Navbar = () => {
               type="text"
               placeholder="Pick your cravings.."
               className="text-gray-700 px-[10px] outline-0 w-full"
+              onChange={(e) => setQuery(e.target.value)}
+              value={query}
             />
           </div>
         </div>

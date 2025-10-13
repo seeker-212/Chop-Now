@@ -6,15 +6,17 @@ import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import FoodCard from "./FoodCard";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
 
 const UserDashboard = () => {
   //Destructing
-  const { city, shopInMyCity, itemInMyCity } = useSelector(
+  const { city, shopInMyCity, itemInMyCity, searchItems } = useSelector(
     (state) => state.user
   );
 
   //NAVIGATOR
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //USEREF
   const cateScrollRef = useRef();
@@ -25,20 +27,20 @@ const UserDashboard = () => {
   const [showRightCateButton, setShowRightCateButton] = useState(false);
   const [showLeftShopButton, setShowLeftShopButton] = useState(false);
   const [showRightShopButton, setShowRightShopButton] = useState(false);
-  const [updatedItemsList, setUpdatedItemsList] = useState([])
+  const [updatedItemsList, setUpdatedItemsList] = useState([]);
 
   const handleFilterCategory = (category) => {
     if (category === "All") {
-      setUpdatedItemsList(itemInMyCity)
-    }else {
-      const filteredList = itemInMyCity?.filter(i => i.category === category)
-      setUpdatedItemsList(filteredList)
+      setUpdatedItemsList(itemInMyCity);
+    } else {
+      const filteredList = itemInMyCity?.filter((i) => i.category === category);
+      setUpdatedItemsList(filteredList);
     }
-  }
+  };
 
   useEffect(() => {
-    setUpdatedItemsList(itemInMyCity)
-  },[itemInMyCity])
+    setUpdatedItemsList(itemInMyCity);
+  }, [itemInMyCity]);
 
   //Update button functiin
   const updateButton = (ref, setLeftButton, setRightButton) => {
@@ -101,6 +103,18 @@ const UserDashboard = () => {
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto">
       <Navbar />
+      {searchItems && searchItems.length > 0 && (
+        <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-5 bg-white shadow-md
+        rounded-2xl mt-4">
+          <h1 className="text-gray-900 text-2xl sm:text-3xl font-semibold border-b-2 border-gray-400
+          pb-2">Search Results</h1>
+          <div className="w-full h-auto flex flex-wrap gap-6 justify-center">
+            {searchItems.map((item) => (
+              <FoodCard data={item} key={item._id} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Inspired section */}
       <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]">
@@ -164,7 +178,12 @@ const UserDashboard = () => {
             ref={shopScrollRef}
           >
             {shopInMyCity?.map((shop, index) => (
-              <CategoryCard name={shop.name} image={shop.image} key={index} onClick={() => navigate(`/shop/${shop._id}`)}/>
+              <CategoryCard
+                name={shop.name}
+                image={shop.image}
+                key={index}
+                onClick={() => navigate(`/shop/${shop._id}`)}
+              />
             ))}
           </div>
           {showRightShopButton && (

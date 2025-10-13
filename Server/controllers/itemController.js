@@ -177,7 +177,7 @@ export const searchItems = async (req, res) => {
   try {
     const { query, city } = req.query;
     if (!query || !city) {
-      return null;
+      return res.status(400).json({ message: "Missing query or city" });
     }
 
     const shops = await Shop.find({
@@ -192,10 +192,10 @@ export const searchItems = async (req, res) => {
     const items = await Item.find({
       shop: { $in: shopIds },
       $or: [
-        { name: { $regex: query, options: "i" } },
-        { category: { $regex: query, options: "i" } },
+        { name: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
       ],
-    }).populate("shop", "name", "image");
+    }).populate("shop", "name image");
     return res.status(200).json(items);
   } catch (error) {
     console.log(error);
