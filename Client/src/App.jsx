@@ -46,7 +46,7 @@ const App = () => {
   useEffect(()=>{
    const socketInstance = io(serverUrl, {withCredentials: true})
    dispatch(setSocket(socketInstance))
-   socketInstance.on('connect', (socket) => {
+   socketInstance.on('connect', () => {
     if (userData) {
       socketInstance.emit('identity', {userId: userData._id})
     }

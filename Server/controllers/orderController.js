@@ -9,7 +9,8 @@ import { sendDeliveryOtpMail } from "../utils/mail.js";
 export const placeOrder = async (req, res) => {
   try {
     const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body;
-    if (cartItems.length === 0 || !cartItems) {
+
+    if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ message: "cart is empty" });
     }
     if (
@@ -17,25 +18,25 @@ export const placeOrder = async (req, res) => {
       !deliveryAddress.latitude ||
       !deliveryAddress.longitude
     ) {
-      return res.status(400).json({ message: "Delivery Address no available" });
+      return res
+        .status(400)
+        .json({ message: "Delivery Address not available" });
     }
 
+    // Group items by shop
     const groupItemByShop = {};
-
     cartItems.forEach((item) => {
       const shopId = item.shop;
-      if (!groupItemByShop[shopId]) {
-        groupItemByShop[shopId] = [];
-      }
+      if (!groupItemByShop[shopId]) groupItemByShop[shopId] = [];
       groupItemByShop[shopId].push(item);
     });
 
+    // Build shopOrders
     const shopOrders = await Promise.all(
       Object.keys(groupItemByShop).map(async (shopId) => {
         const shop = await Shop.findById(shopId).populate("owner");
-        if (!shop) {
-          return res.status(400).json({ message: "Shop not found" });
-        }
+        if (!shop) throw new Error("Shop not found");
+
         const items = groupItemByShop[shopId];
         const subtotal = items.reduce(
           (sum, i) => sum + Number(i.price) * Number(i.quantity),
@@ -47,7 +48,7 @@ export const placeOrder = async (req, res) => {
           owner: shop.owner._id,
           subtotal,
           shopOrderItem: items.map((i) => ({
-            item: i.id,
+            item: i.id || i._id,
             price: i.price,
             quantity: i.quantity,
             name: i.name,
@@ -56,6 +57,7 @@ export const placeOrder = async (req, res) => {
       })
     );
 
+    // Create the order
     const newOrder = await Order.create({
       user: req.userId,
       paymentMethod,
@@ -64,6 +66,7 @@ export const placeOrder = async (req, res) => {
       shopOrders,
     });
 
+    // Populate full info before sending / emitting
     await newOrder.populate(
       "shopOrders.shopOrderItem.item",
       "name image price"
@@ -72,30 +75,37 @@ export const placeOrder = async (req, res) => {
     await newOrder.populate("shopOrders.owner", "name socketId");
     await newOrder.populate("user", "name email mobile");
 
-    //Implementing socket io for bidirectional placing order
-    const io = req.get("io");
-
-    if (io) {
+    // ✅ SOCKET.IO
+    // ✅ SOCKET.IO emit
+    const io = req.app.get("io");
+    if (io && newOrder?.shopOrders?.length > 0) {
       newOrder.shopOrders.forEach((shopOrder) => {
-        //Owner Socket
-        const ownerSocketId = shopOrder.owner.ownerSocketId;
+        const ownerSocketId = shopOrder.owner?.socketId;
         if (ownerSocketId) {
           io.to(ownerSocketId).emit("newOrder", {
-            _id: newOrder._id,
+            orderId: newOrder._id,
             paymentMethod: newOrder.paymentMethod,
-            user: newOrder.user,
-            shopOrders: shopOrder,
-            createdAt: newOrder.createdAt,
             deliveryAddress: newOrder.deliveryAddress,
+            createdAt: newOrder.createdAt,
+            totalAmount: newOrder.totalAmount,
+            user: newOrder.user,
+            shopOrder: {
+              ...shopOrder.toObject(),
+              shop: shopOrder.shop,
+              owner: shopOrder.owner,
+            },
           });
         }
       });
     }
 
+    // Send response
     return res.status(201).json(newOrder);
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: `Error placing order ${error}` });
+    console.log("Error placing order:", error);
+    return res
+      .status(500)
+      .json({ message: `Error placing order: ${error.message}` });
   }
 };
 
@@ -145,7 +155,7 @@ export const getMyOrders = async (req, res) => {
 
 //Order Status Controller
 export const updateOrderStatus = async (req, res) => {
-  console.log("🔥 updateOrderStatus hit");
+  console.log(" updateOrderStatus hit");
   try {
     const { orderId, shopId } = req.params;
     const { status } = req.body;
