@@ -69,6 +69,28 @@ export const placeOrder = async (req, res) => {
       "name image price"
     );
     await newOrder.populate("shopOrders.shop", "name");
+    await newOrder.populate("shopOrders.owner", "name socketId");
+    await newOrder.populate("user", "name email mobile");
+
+    //Implementing socket io for bidirectional placing order
+    const io = req.get("io");
+
+    if (io) {
+      newOrder.shopOrders.forEach((shopOrder) => {
+        //Owner Socket
+        const ownerSocketId = shopOrder.owner.ownerSocketId;
+        if (ownerSocketId) {
+          io.to(ownerSocketId).emit("newOrder", {
+            _id: newOrder._id,
+            paymentMethod: newOrder.paymentMethod,
+            user: newOrder.user,
+            shopOrders: shopOrder,
+            createdAt: newOrder.createdAt,
+            deliveryAddress: newOrder.deliveryAddress,
+          });
+        }
+      });
+    }
 
     return res.status(201).json(newOrder);
   } catch (error) {
@@ -432,17 +454,17 @@ export const verifyDeliveryOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid/Expired OTP" });
     }
 
-    shopOrder.status = "delivered"
-    shopOrder.deliveredAt = Date.now()
-    await order.save()
+    shopOrder.status = "delivered";
+    shopOrder.deliveredAt = Date.now();
+    await order.save();
 
     await DeliveryAssignment.deleteOne({
       shopOrderId,
       order: orderId,
-      assignedTo: shopOrder.assignedDeliveryBoy
-    })
+      assignedTo: shopOrder.assignedDeliveryBoy,
+    });
 
-    return res.status(200).json({message: "Order Delivered Sucessfully"})
+    return res.status(200).json({ message: "Order Delivered Sucessfully" });
   } catch (error) {
     console.log(error);
     return res

@@ -51,7 +51,10 @@ const App = () => {
       socketInstance.emit('identity', {userId: userData._id})
     }
    })
-  },[])
+   return () => {
+    socketInstance.disconnect()
+   }
+  },[userData?._id])
 
   const isLoading = loading || ownerLoading;
   if (isLoading) {
