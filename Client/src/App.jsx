@@ -4,7 +4,7 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import ForgotPassword from "./pages/ForgotPassword";
 import useGetCurrentUser from "./hooks/useGetCurrentUser";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Home from "./pages/Home";
 import useGetCity from "./hooks/useGetCity";
 import CreateEditShop from "./pages/CreateEditShop";
@@ -21,6 +21,9 @@ import useGetMyOrders from "./hooks/useGetMyOrders";
 import useUpdateLocation from "./hooks/useUpdateLocation";
 import TrackOrder from "./pages/TrackOrder";
 import Shop from "./pages/Shop";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
+import { setSocket } from "./redux/userSlice";
 
 //Exporting Server URL so other pages can use it
 export const serverUrl = "http://localhost:5000";
@@ -36,6 +39,20 @@ const App = () => {
 
   const { userData, loading } = useSelector((state) => state.user);
   const { ownerLoading } = useSelector((state) => state.owner);
+
+  //Redux Dispatch
+  const dispatch = useDispatch()
+
+  useEffect(()=>{
+   const socketInstance = io(serverUrl, {withCredentials: true})
+   dispatch(setSocket(socketInstance))
+   socketInstance.on('connect', (socket) => {
+    if (userData) {
+      socketInstance.emit('identity', {userId: userData._id})
+    }
+   })
+  },[])
+
   const isLoading = loading || ownerLoading;
   if (isLoading) {
     return (
@@ -44,6 +61,7 @@ const App = () => {
       </div>
     );
   }
+
   return (
     <Routes>
       <Route

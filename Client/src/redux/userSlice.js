@@ -13,7 +13,8 @@ const userSlice = createSlice({
     cartItems: [],
     totalAmount: 0,
     myOrders: [],
-    searchItems: null
+    searchItems: null,
+    socket: null,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -37,6 +38,9 @@ const userSlice = createSlice({
     },
     setItemInMyCity: (state, action) => {
       state.itemInMyCity = action.payload;
+    },
+    setSocket: (state, action) => {
+      state.socket = action.payload;
     },
     addToCart: (state, action) => {
       const cartItem = action.payload;
@@ -79,9 +83,11 @@ const userSlice = createSlice({
       const { orderId, shopId, status, availableBoys, assignment } =
         action.payload;
       const order = state.myOrders.find((o) => o._id === orderId);
-      console.log("Updated Redux myOrders:", JSON.parse(JSON.stringify(state.myOrders)));
+      console.log(
+        "Updated Redux myOrders:",
+        JSON.parse(JSON.stringify(state.myOrders))
+      );
 
-      
       if (order) {
         const shopOrder = order.shopOrders.find(
           (so) => so.shop._id === shopId || so.shop === shopId
@@ -96,8 +102,8 @@ const userSlice = createSlice({
       }
     },
     setSearchItems: (state, action) => {
-      state.searchItems = action.payload
-    }
+      state.searchItems = action.payload;
+    },
   },
 });
 
@@ -116,6 +122,7 @@ export const {
   addMyOrder,
   updateOrderStatus,
   setSearchItems,
+  setSocket,
 } = userSlice.actions;
 
 export default userSlice.reducer;
