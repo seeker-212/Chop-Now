@@ -8,6 +8,7 @@ import {
   getItemByCity,
   getItemById,
   getItemByShops,
+  rating,
   searchItems,
 } from "../controllers/itemController.js";
 
@@ -20,5 +21,6 @@ itemRouter.get("/delete/:itemId", isAuth, deleteItem);
 itemRouter.get("/get-by-city/:city", isAuth, getItemByCity);
 itemRouter.get("/get-by-shop/:shopId", isAuth, getItemByShops);
 itemRouter.get("/search-items", isAuth, searchItems);
+itemRouter.post("/rating", isAuth, rating);
 
 export default itemRouter;
