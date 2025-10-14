@@ -107,7 +107,6 @@ const OwnerCartOrder = ({ data }) => {
           <option value="delivered">Delivered</option>
         </select>
       </div>
-      {console.log("DATA: ", data)}
       {data.shopOrders[0]?.status === "out for delivery" && (
         <div className="mt-3 p-2 border border-gray-300 rounded-lg text-sm bg-green-50">
           {data.shopOrders[0]?.assignedDeliveryBoy ? (

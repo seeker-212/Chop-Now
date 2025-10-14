@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "./Navbar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { serverUrl } from "../App";
 import { useEffect } from "react";
@@ -8,7 +8,10 @@ import { useState } from "react";
 import DeliveryBoyTracking from "./DeliveryBoyTracking";
 
 const DeliveryBoy = () => {
-  const { userData } = useSelector((state) => state.user);
+  const { userData, socket } = useSelector((state) => state.user);
+
+  //Dispatch
+  const dispatch = useDispatch()
 
   //useState Variables
   const [currentOrder, setCurrentOrder] = useState();
@@ -84,6 +87,18 @@ const DeliveryBoy = () => {
       console.log(error);
     }
   };
+
+  useEffect(()=>{
+    socket?.on('newAssignment', (data) => {
+      if (data.sentTo === userData._id) {
+        setAvailableAssignment(prev => [...prev, data])
+      }
+    })
+
+    return () => {
+      socket?.off('newAssignment')
+    }
+  },[socket])
 
   //useEffect
   useEffect(() => {

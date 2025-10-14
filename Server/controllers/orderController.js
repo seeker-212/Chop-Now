@@ -75,8 +75,8 @@ export const placeOrder = async (req, res) => {
     await newOrder.populate("shopOrders.owner", "name socketId");
     await newOrder.populate("user", "name email mobile");
 
-    // ✅ SOCKET.IO
-    // ✅ SOCKET.IO emit
+    // SOCKET.IO
+    // SOCKET.IO emit
     const io = req.app.get("io");
     if (io && newOrder?.shopOrders?.length > 0) {
       newOrder.shopOrders.forEach((shopOrder) => {
@@ -155,7 +155,6 @@ export const getMyOrders = async (req, res) => {
 
 //Order Status Controller
 export const updateOrderStatus = async (req, res) => {
-  console.log(" updateOrderStatus hit");
   try {
     const { orderId, shopId } = req.params;
     const { status } = req.body;
@@ -175,6 +174,7 @@ export const updateOrderStatus = async (req, res) => {
 
     shopOrder.status = status;
     let deliveryBoyPayLoad = [];
+
     if (status === "out for delivery" || !shopOrder.assignment) {
       const { longitude, latitude } = order.deliveryAddress;
       const nearByDeliveryBoys = await User.find({
@@ -225,9 +225,35 @@ export const updateOrderStatus = async (req, res) => {
         latitude: b.location.coordinates?.[1],
         mobile: b.mobile,
       }));
+
+      await deliveryAssignment.populate("order");
+      await deliveryAssignment.populate("shop");
+
+      const io = req.app.get("io");
+      if (io) {
+        availableBoys.forEach((boy) => {
+          const boySocketId = boy.socketId;
+
+          if (boySocketId) {
+            io.to(boySocketId).emit("newAssignment", {
+              sentTo: boy._id,
+              assignmentId: deliveryAssignment._id,
+              orderId: deliveryAssignment.order._id,
+              shopName: deliveryAssignment.shop.name,
+              deliveryAddress: deliveryAssignment.order.deliveryAddress,
+              items:
+                deliveryAssignment.order.shopOrders.find((so) =>
+                  so._id.equals(deliveryAssignment.shopOrderId)
+                ).shopOrderItem || [],
+              subtotal: deliveryAssignment.order.shopOrders.find((so) =>
+                so._id.equals(deliveryAssignment.shopOrderId)
+              )?.subtotal,
+            });
+          }
+        });
+      }
     }
 
-    await shopOrder.save();
     await order.save();
 
     const updatedShopOrder = order.shopOrders.find(
@@ -239,6 +265,24 @@ export const updateOrderStatus = async (req, res) => {
       "shopOrders.assignedDeliveryBoy",
       "fullName email mobile"
     );
+    await order.populate("user", "socketId");
+
+    const io = req.app.get("io");
+    if (io) {
+      const userSocketId = order.user.socketId;
+
+      if (userSocketId) {
+        io.to(userSocketId).emit("update-status", {
+          orderId: order._id,
+          shopId: updatedShopOrder.shop._id,
+          status: updatedShopOrder.status,
+          userId: order.user._id,
+        });
+      } else {
+        console.log("No socketId found for user:", order.user._id);
+      }
+    }
+
     return res.status(200).json({
       shopOrder: updatedShopOrder,
       assignedDeliveryBoy: updatedShopOrder?.assignedDeliveryBoy,

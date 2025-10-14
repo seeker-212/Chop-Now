@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import UserCartOrder from "../components/userCartOrder";
 import OwnerCartOrder from "../components/OwnerCartOrder";
 import { useEffect } from "react";
-import { setMyOrders } from "../redux/userSlice";
+import { setMyOrders, updateRealtimeOrderStatus } from "../redux/userSlice";
 
 const MyOrder = () => {
   //Navigator
@@ -18,12 +18,9 @@ const MyOrder = () => {
 
   //UseEffect
   useEffect(() => {
-    if (!socket) return;
+    // Listen to ALL socket events for debugging
 
     const handleNewOrder = (data) => {
-      // console.log("SOCKET DATA:", data);
-
-      // Only add to owner's orders if this order belongs to them
       if (data.shopOrder?.owner?._id === userData._id) {
         dispatch(
           setMyOrders([
@@ -42,12 +39,33 @@ const MyOrder = () => {
       }
     };
 
+    const handleUpdateStatus = ({ orderId, shopId, status, userId }) => {
+      console.log("update-status received:", {
+        orderId,
+        shopId,
+        status,
+        userId,
+      });
+
+      if (userId === userData._id) {
+        dispatch(updateRealtimeOrderStatus({ orderId, shopId, status }));
+      } else {
+        console.log("update-status ignored: userId mismatch", {
+          local: userData._id,
+          received: userId,
+        });
+      }
+    };
+
     socket.on("newOrder", handleNewOrder);
+    socket.on("update-status", handleUpdateStatus);
 
     return () => {
       socket.off("newOrder", handleNewOrder);
+      socket.off("update-status", handleUpdateStatus);
+      socket.offAny();
     };
-  }, [socket, userData, myOrders, dispatch]);
+  }, [socket, userData?._id, dispatch]);
 
   return (
     <div className="w-full min-h-screen bg-[#fff9f6] flex justify-center px-4">
