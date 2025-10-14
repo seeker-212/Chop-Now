@@ -21,12 +21,16 @@ export const getCurrentUser = async (req, res) => {
 export const updateUserLocation = async (req, res) => {
   try {
     const { lat, lon } = req.body;
-    const user = await User.findByIdAndUpdate(req.userId, {
-      location: {
-        type: "Point",
-        coordinates: [lon, lat],
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      {
+        location: {
+          type: "Point",
+          coordinates: [lon, lat],
+        },
       },
-    }, {new: true});
+      { new: true }
+    );
 
     //Checking if user Exists
     if (!user) {

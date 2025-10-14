@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import DeliveryBoyTracking from "../components/DeliveryBoyTracking";
+import { useSelector } from "react-redux";
 
 const TrackOrder = () => {
   const { orderId } = useParams();
@@ -13,8 +14,11 @@ const TrackOrder = () => {
   //Navigate
   const navigate = useNavigate();
 
+  const { socket } = useSelector((state) => state.user);
+
   //USESTATE VARIABLE
   const [currentOrder, setCurrentOrder] = useState();
+  const [liveLocation, setLiveLocation] = useState({});
 
   const handleGetOrder = async () => {
     try {
