@@ -6,19 +6,37 @@ import { serverUrl } from "../App";
 import { useEffect } from "react";
 import { useState } from "react";
 import DeliveryBoyTracking from "./DeliveryBoyTracking";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { ClipLoader } from "react-spinners";
 
 const DeliveryBoy = () => {
   const { userData, socket } = useSelector((state) => state.user);
 
   //Dispatch
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   //useState Variables
   const [currentOrder, setCurrentOrder] = useState();
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [availableAssignment, setAvailableAssignment] = useState(null);
   const [otp, setOtp] = useState("");
-  const [todayDelivery, setTodayDelivery] = useState([])
+  const [todayDelivery, setTodayDelivery] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const ratePerDelivery = 1500;
+  const totalEarning = todayDelivery.reduce(
+    (sum, d) => sum + d.count * ratePerDelivery,
+    0
+  );
 
   const getAssignment = async () => {
     try {
@@ -59,20 +77,23 @@ const DeliveryBoy = () => {
   };
 
   const sendOtp = async () => {
+    setLoading(true);
     try {
       const result = await axios.post(
         `${serverUrl}/api/order/send-delivery-otp`,
         { orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id },
         { withCredentials: true }
       );
-      console.log(result.data);
+      setLoading(false);
       setShowOtpBox(true);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
   const verifyOtp = async () => {
+    setMessage("");
     try {
       const result = await axios.post(
         `${serverUrl}/api/order/verify-delivery-otp`,
@@ -83,7 +104,8 @@ const DeliveryBoy = () => {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
+      setMessage(result.data.message);
+      location.reload()
     } catch (error) {
       console.log(error);
     }
@@ -93,33 +115,33 @@ const DeliveryBoy = () => {
     try {
       const result = await axios.get(
         `${serverUrl}/api/order/get-today-deliveries`,
-        
+
         { withCredentials: true }
       );
       console.log(result.data);
-      setTodayDelivery(result.data)
+      setTodayDelivery(result.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(()=>{
-    socket?.on('newAssignment', (data) => {
+  useEffect(() => {
+    socket?.on("newAssignment", (data) => {
       if (data.sentTo === userData._id) {
-        setAvailableAssignment(prev => [...prev, data])
+        setAvailableAssignment((prev) => [...prev, data]);
       }
-    })
+    });
 
     return () => {
-      socket?.off('newAssignment')
-    }
-  },[socket])
+      socket?.off("newAssignment");
+    };
+  }, [socket]);
 
   //useEffect
   useEffect(() => {
     getAssignment();
     getCurrentOrder();
-    handletodayDeliveries()
+    handletodayDeliveries();
   }, [userData]);
 
   return (
@@ -141,6 +163,35 @@ const DeliveryBoy = () => {
             {userData.location.coordinates[0]}
           </p>
         </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-5 w-[90%] mb-6 border border-green-100">
+          <h1 className="text-lg font-bold mb-3 text-[#32CD32]">
+            Today's Deliveries
+          </h1>
+
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={todayDelivery}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="hour" tickFormatter={(h) => `${h}:00`} />
+              <YAxis allowDecimals={false} />
+              <Tooltip
+                formatter={(value) => [value, "orders"]}
+                labelFormatter={(label) => `${label}:00`}
+              />
+              <Bar dataKey="count" fill="#32CD32" />
+            </BarChart>
+          </ResponsiveContainer>
+
+          <div className="max-w-sm mx-auto mt-6 p-6 bg-white rounded-2xl shadow-lg text-center">
+            <h1 className="text-xl font-semibold text-gray-800 mb-2">
+              Today's Earning
+            </h1>
+            <span className="text-3xl font-bold text-green-600">
+              ₦{totalEarning}
+            </span>
+          </div>
+        </div>
+
         {!currentOrder && (
           <div className="bg-white rounded-2xl p-5 shadow-md w-[90%] border border-green-100">
             <h1 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -205,8 +256,9 @@ const DeliveryBoy = () => {
                 onClick={sendOtp}
                 className="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4
             rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200 cursor-pointer"
+                disabled={loading}
               >
-                Mark As Delivered
+                {loading ? <ClipLoader size={20} color="white" /> : "Mark As Delivered"}
               </button>
             ) : (
               <div className="mt-4 p-4 border border-gray-300 rounded-xl bg-gray-50">
@@ -224,6 +276,8 @@ const DeliveryBoy = () => {
                 outline-none focus:ring-2 focus:ring-green-400"
                   placeholder="Enter OTP"
                 />
+                {message && <p className="text-center text-green-400">{message}</p>}
+                
                 <button
                   onClick={verifyOtp}
                   className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold
