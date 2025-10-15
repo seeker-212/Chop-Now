@@ -1,9 +1,12 @@
-import React from "react";
+import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { serverUrl } from "../App";
 
 const UserCartOrder = ({ data }) => {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const [selectedRating, setSelectedRating] = useState({});
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -12,6 +15,22 @@ const UserCartOrder = ({ data }) => {
       month: "short",
       year: "numeric",
     });
+  };
+
+  const handleRating = async (itemId, rating) => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/item/rating`,
+        { itemId, rating },
+        { withCredentials: true }
+      );
+      setSelectedRating((prev) => ({
+        ...prev,
+        [itemId]: rating,
+      }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -55,6 +74,23 @@ const UserCartOrder = ({ data }) => {
                 <p className="text-xs text-gray-500">
                   ₦{item.price} x Qty: {item.quantity}
                 </p>
+
+                {shopOrder.status === "delivered" && (
+                  <div className="flex space-x-1 mt-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                      onClick={() => handleRating(item.item._id, star)}
+                        className={`text-lg ${
+                          selectedRating[item.item._id] >= star
+                            ? "text-yellow-400"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -70,8 +106,9 @@ const UserCartOrder = ({ data }) => {
       <div className="flex justify-between items-center border-t pt-2">
         <p className="font-semibold">Total: ₦{data.totalAmount}</p>
         <button
-          onClick={()=>navigate(`/track-order/${data._id}`)}
-         className="bg-[#32CD32] hover:bg-[#2ab12a] text-white px-4 py-2 rounded-lg text-sm">
+          onClick={() => navigate(`/track-order/${data._id}`)}
+          className="bg-[#32CD32] hover:bg-[#2ab12a] text-white px-4 py-2 rounded-lg text-sm"
+        >
           Track Order
         </button>
       </div>
