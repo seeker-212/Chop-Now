@@ -70,7 +70,12 @@ const OwnerCartOrder = ({ data }) => {
                 />
                 <p className="text-sm font-semibold mt-1">{item.name}</p>
                 <p className="text-xs text-gray-500">
-                  ₦{item.price} x Qty: {item.quantity}
+                  ₦
+                  {item.price.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  x Qty: {item.quantity}
                 </p>
               </div>
             ))}
@@ -134,7 +139,11 @@ const OwnerCartOrder = ({ data }) => {
       )}
 
       <div className="text-right font-bold text-gray-800 text-sm">
-        Total: ₦{data.shopOrders[0]?.subtotal}
+        Total: ₦
+        {data.shopOrders[0]?.subtotal.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
       </div>
     </div>
   );

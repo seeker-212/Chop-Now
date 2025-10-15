@@ -29,7 +29,9 @@ const CheckOut = () => {
   //Destructuring from map slice
   const { location, address } = useSelector((state) => state.map);
   //Destructuring from user slice
-  const { cartItems, totalAmount, userData } = useSelector((state) => state.user);
+  const { cartItems, totalAmount, userData } = useSelector(
+    (state) => state.user
+  );
 
   //USESTATE VARIABLE
   const [addressInput, setAddressInput] = useState("");
@@ -52,12 +54,11 @@ const CheckOut = () => {
   };
 
   const getCurrentLocation = () => {
-      const latitude = userData.location.coordinates[1]
-      const longitude = userData.location.coordinates[0]
-    
-      dispatch(setLocation({ lat: latitude, lon: longitude }));
-      getAddressByLatLng(latitude, longitude);
-    ;
+    const latitude = userData.location.coordinates[1];
+    const longitude = userData.location.coordinates[0];
+
+    dispatch(setLocation({ lat: latitude, lon: longitude }));
+    getAddressByLatLng(latitude, longitude);
   };
 
   const getAddressByLatLng = async (lat, lng) => {
@@ -103,8 +104,8 @@ const CheckOut = () => {
         },
         { withCredentials: true }
       );
-      dispatch(addMyOrder(result.data))
-      navigate("/order-placed")
+      dispatch(addMyOrder(result.data));
+      navigate("/order-placed");
     } catch (error) {
       console.log(error);
     }
@@ -246,21 +247,48 @@ const CheckOut = () => {
                 <span>
                   {item.name} X {item.quantity}
                 </span>
-                <span>₦ {item.price * item.quantity}</span>
+                <span>
+                  ₦{" "}
+                  {(item.price * item.quantity).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
               </div>
             ))}
             <hr className="border-gray-300 my-2" />
             <div className="flex justify-between font-medium text-gray-800">
               <span>SubTotal</span>
-              <span>₦ {totalAmount}</span>
+              <span>
+                ₦{" "}
+                {totalAmount.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </div>
             <div className="flex justify-between text-gray-700">
               <span>Delivery Fee</span>
-              <span>₦ {deliveryFee === 0 ? "free" : deliveryFee}</span>
+              <span>
+                ₦{" "}
+                {(deliveryFee === 0 ? "free" : deliveryFee).toLocaleString(
+                  "en-US",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}
+              </span>
             </div>
             <div className="flex justify-between text-lg font-bold text-[#32CD32] pt-2">
               <span>Total Amount</span>
-              <span>₦ {amountWithDeliveryFee}</span>
+              <span>
+                ₦{" "}
+                {amountWithDeliveryFee.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
             </div>
           </div>
         </section>

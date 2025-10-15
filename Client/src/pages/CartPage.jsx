@@ -43,7 +43,11 @@ const CartPage = () => {
             >
               <h1 className="text-lg font-semibold">Total Amount</h1>
               <span className="text-xl font-bold text-[#32CD32]">
-                ₦ {totalAmount}
+                ₦{" "}
+                {totalAmount.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
 

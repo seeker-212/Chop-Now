@@ -72,14 +72,19 @@ const UserCartOrder = ({ data }) => {
                 />
                 <p className="text-sm font-semibold mt-1">{item.name}</p>
                 <p className="text-xs text-gray-500">
-                  ₦{item.price} x Qty: {item.quantity}
+                  ₦
+                  {item.price.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  x Qty: {item.quantity}
                 </p>
 
                 {shopOrder.status === "delivered" && (
                   <div className="flex space-x-1 mt-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
-                      onClick={() => handleRating(item.item._id, star)}
+                        onClick={() => handleRating(item.item._id, star)}
                         className={`text-lg ${
                           selectedRating[item.item._id] >= star
                             ? "text-yellow-400"
@@ -95,7 +100,13 @@ const UserCartOrder = ({ data }) => {
             ))}
           </div>
           <div className="flex justify-between items-center border-t pt-2">
-            <p className="font-semibold">Subtotal: ₦{shopOrder.subtotal}</p>
+            <p className="font-semibold">
+              Subtotal: ₦
+              {shopOrder.subtotal.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
             <span className="text-sm font-medium text-blue-600">
               {shopOrder.status}
             </span>
@@ -104,7 +115,13 @@ const UserCartOrder = ({ data }) => {
       ))}
 
       <div className="flex justify-between items-center border-t pt-2">
-        <p className="font-semibold">Total: ₦{data.totalAmount}</p>
+        <p className="font-semibold">
+          Total: ₦
+          {data.totalAmount.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </p>
         <button
           onClick={() => navigate(`/track-order/${data._id}`)}
           className="bg-[#32CD32] hover:bg-[#2ab12a] text-white px-4 py-2 rounded-lg text-sm"

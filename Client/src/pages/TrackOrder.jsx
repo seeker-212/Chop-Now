@@ -61,7 +61,10 @@ const TrackOrder = () => {
             </p>
             <p>
               <span className="font-semibold">Subtotal:</span> ₦
-              {shopOrder.subtotal}
+              {shopOrder.subtotal.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
             <p className="mt-6">
               <span className="font-semibold">Delivery Address:</span>{" "}

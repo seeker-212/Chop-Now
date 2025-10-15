@@ -105,7 +105,7 @@ const DeliveryBoy = () => {
         { withCredentials: true }
       );
       setMessage(result.data.message);
-      location.reload()
+      location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -187,7 +187,11 @@ const DeliveryBoy = () => {
               Today's Earning
             </h1>
             <span className="text-3xl font-bold text-green-600">
-              ₦{totalEarning}
+              ₦
+              {totalEarning.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </span>
           </div>
         </div>
@@ -216,7 +220,11 @@ const DeliveryBoy = () => {
                         </span>
                       </p>
                       <p className="text-xs font-semibold text-gray-500">
-                        {a.items.length} items | ₦{a.subtotal}
+                        {a.items.length} items | ₦
+                        {a.subtotal.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </p>
                     </div>
                     <button
@@ -258,7 +266,11 @@ const DeliveryBoy = () => {
             rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200 cursor-pointer"
                 disabled={loading}
               >
-                {loading ? <ClipLoader size={20} color="white" /> : "Mark As Delivered"}
+                {loading ? (
+                  <ClipLoader size={20} color="white" />
+                ) : (
+                  "Mark As Delivered"
+                )}
               </button>
             ) : (
               <div className="mt-4 p-4 border border-gray-300 rounded-xl bg-gray-50">
@@ -276,8 +288,10 @@ const DeliveryBoy = () => {
                 outline-none focus:ring-2 focus:ring-green-400"
                   placeholder="Enter OTP"
                 />
-                {message && <p className="text-center text-green-400">{message}</p>}
-                
+                {message && (
+                  <p className="text-center text-green-400">{message}</p>
+                )}
+
                 <button
                   onClick={verifyOtp}
                   className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold

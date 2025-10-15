@@ -32,9 +32,19 @@ const CartItem = ({ data }) => {
         />
         <div>
           <h1 className="font-medium text-gray-800">{data.name}</h1>
-          <p className="text-sm text-gray-500">₦ {data.price}</p>
+          <p className="text-sm text-gray-500">
+            ₦{" "}
+            {data.price.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </p>
           <p className="font-bold text-gray-900">
-            ₦ {data.price * data.quantity}
+            ₦{" "}
+            {(data.price * data.quantity).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
       </div>
