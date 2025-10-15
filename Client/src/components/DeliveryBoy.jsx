@@ -18,6 +18,7 @@ const DeliveryBoy = () => {
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [availableAssignment, setAvailableAssignment] = useState(null);
   const [otp, setOtp] = useState("");
+  const [todayDelivery, setTodayDelivery] = useState([])
 
   const getAssignment = async () => {
     try {
@@ -88,6 +89,20 @@ const DeliveryBoy = () => {
     }
   };
 
+  const handletodayDeliveries = async () => {
+    try {
+      const result = await axios.get(
+        `${serverUrl}/api/order/get-today-deliveries`,
+        
+        { withCredentials: true }
+      );
+      console.log(result.data);
+      setTodayDelivery(result.data)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(()=>{
     socket?.on('newAssignment', (data) => {
       if (data.sentTo === userData._id) {
@@ -104,6 +119,7 @@ const DeliveryBoy = () => {
   useEffect(() => {
     getAssignment();
     getCurrentOrder();
+    handletodayDeliveries()
   }, [userData]);
 
   return (

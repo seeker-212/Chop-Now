@@ -529,47 +529,54 @@ export const verifyDeliveryOtp = async (req, res) => {
 
 export const getTodayDelivery = async (req, res) => {
   try {
-    const deliveryBoyId = req.userId;
-    const startsOfDay = new Date();
-    startsOfDay.setHours(0, 0, 0, 0);
+    // Convert to ObjectId
+    const deliveryBoyId = (req.userId);
 
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    // Proper query using $elemMatch
     const orders = await Order.find({
-      "shopOrders.assignedDeliveryBoy": deliveryBoyId,
-      "shopOrders.status": "delivered",
-      "shopOrders.deliveredAt": { $gte: startsOfDay },
+      shopOrders: {
+        $elemMatch: {
+          assignedDeliveryBoy: deliveryBoyId,
+          status: "delivered",
+          deliveredAt: { $gte: startOfDay },
+        },
+      },
     }).lean();
 
-    let todaysDeliveries = [];
+    // Extract today’s delivered orders
+    const todaysDeliveries = [];
     orders.forEach((order) => {
       order.shopOrders.forEach((shopOrder) => {
         if (
-          shopOrder.assignedDeliveryBoy === deliveryBoyId &&
+          shopOrder.assignedDeliveryBoy?.toString() === req.userId &&
           shopOrder.status === "delivered" &&
-          shopOrder.deliveredAt &&
-          shopOrder.deliveredAt >= startsOfDay
+          shopOrder.deliveredAt >= startOfDay
         ) {
           todaysDeliveries.push(shopOrder);
         }
       });
     });
 
-    let stats = {};
-
+    // Count per hour
+    const stats = {};
     todaysDeliveries.forEach((shopOrder) => {
       const hour = new Date(shopOrder.deliveredAt).getHours();
-      stats[hour] = stats[hour || 0] + 1;
+      stats[hour] = (stats[hour] || 0) + 1;
     });
 
-    let formattedStats = Object.keys(stats).map((hour) => ({
-      hour: parseInt(hour),
-      count: stats[hour],
-    }));
-
-    formattedStats.sort((a, b) => a.hour - b.hour);
+    const formattedStats = Object.keys(stats)
+      .map((hour) => ({
+        hour: parseInt(hour),
+        count: stats[hour],
+      }))
+      .sort((a, b) => a.hour - b.hour);
 
     return res.status(200).json(formattedStats);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: `today delivery error ${error}` });
   }
 };
