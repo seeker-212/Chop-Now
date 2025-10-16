@@ -1,13 +1,13 @@
-import food_1 from "./food_1.png";
-import food_2 from "./food_2.png";
-import food_3 from "./food_3.png";
-import food_4 from "./food_4.png";
-import food_5 from "./food_5.png";
+import food_1 from "./food_1.jpg";
+import food_2 from "./food_2.jpg";
+import food_3 from "./food_3.jpg";
+import food_4 from "./food_4.jpg";
+import food_5 from "./food_5.jpg";
 import food_6 from "./food_6.png";
-import food_7 from "./food_7.png";
-import food_8 from "./food_8.png";
-import food_9 from "./food_9.png";
-import food_10 from "./food_10.png";
+import food_7 from "./food_7.jpg";
+import food_8 from "./food_8.jpg";
+import food_9 from "./food_9.jpg";
+import food_10 from "./food_10.jpeg";
 import food_11 from "./food_11.png";
 
 

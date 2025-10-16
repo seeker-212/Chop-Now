@@ -17,9 +17,12 @@ const OwnerItemCard = ({ data }) => {
   //This function will handle Item Deletion
   const deleteItemHandler = async () => {
     try {
-      const result = await axios.get(`${serverUrl}/api/item/delete/${data._id}`, {
-        withCredentials: true,
-      });
+      const result = await axios.get(
+        `${serverUrl}/api/item/delete/${data._id}`,
+        {
+          withCredentials: true,
+        }
+      );
       dispatch(setMyShopData(result.data));
     } catch (error) {
       console.log(error);
@@ -48,7 +51,13 @@ const OwnerItemCard = ({ data }) => {
           </p>
         </div>
         <div className="flex items-center justify-between">
-          <div className="text-[#32CD32] font-bold">{data.price}</div>
+          <div className="text-[#32CD32] font-bold">
+            ₦
+            {data.price.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </div>
           <div className="flex items-center gap-2">
             <div
               className="cursor-pointer p-2 rounded-full hover:bg-[#32CD32]/10 text-[#32CD32]"
